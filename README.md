@@ -22,7 +22,7 @@ Apache License v2.0
 Luke Govia (luke.c.govia@raytheon.com)
 
 ## Acknowledgements
-This effort was partially funded by ARO under contract W911NF-14-C-0048.
+This effort was partially funded by ARO under contracts W911NF-19-C-0092 and W911NF-14-C-0048.
 
 ## Copyright
 Raytheon BBN Technologies
