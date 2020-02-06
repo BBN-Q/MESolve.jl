@@ -27,7 +27,7 @@ These output an array of density matrices (solution of the master equation as a 
 
 There is 1 function to solve covaraiance matrix differential equations:
 
-CV_solve_full_time_dependent() : Time-dependent Hamiltonian, decay rate, and coherent drive.
+* CV_solve_full_time_dependent() : Time-dependent Hamiltonian, decay rate, and coherent drive.
 
 This outputs an array of covariance matrices and an array of average value vectors (solutions as a function of time), and arrays of the times of solution.
 
