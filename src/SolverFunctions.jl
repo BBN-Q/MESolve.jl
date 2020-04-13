@@ -57,7 +57,7 @@ KEYWORD OPTIONAL
 	alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
 """
 
-function me_solve_H_time_dependent(rho_in::Array{T1,2},H::Function,Gamma::Array{T3,3},rates::Array{T4,1},t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
+function me_solve_H_time_dependent(rho_in::Array{T1,2},H::Function,Gamma::Array{T3,3},rates::Array{T4,1},t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5(),iter_num=1e5) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
 
 	rho_in = convert(Array{ComplexF64,2},rho_in)
 	Gamma = convert(Array{ComplexF64,3},Gamma)
@@ -75,7 +75,7 @@ function me_solve_H_time_dependent(rho_in::Array{T1,2},H::Function,Gamma::Array{
         tstep = (tf-t0)./100
     end
 
-    sol = solve(prob, alg, saveat = tstep, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2])
+    sol = solve(prob, alg, saveat = tstep, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2], maxiters=iter_num)
 
     tvec = sol.t
     rho_out = sol.u
@@ -100,7 +100,7 @@ override: Booelan. If true, overrides the error checking that the data save time
 
 """
 
-function me_solve_H_time_dependent(rho_in::Array{T1,2},Hops::Array{T5,3},Hfuncs::Function,Gamma::Array{T3,3},rates::Array{T4,1},t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5(),adapt::Bool = true,δt::Float64 = tols[1],override::Bool = false) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat, T5 <: Number}
+function me_solve_H_time_dependent(rho_in::Array{T1,2},Hops::Array{T5,3},Hfuncs::Function,Gamma::Array{T3,3},rates::Array{T4,1},t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5(),iter_num=1e5,adapt::Bool = true,δt::Float64 = tols[1],override::Bool = false) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat, T5 <: Number}
 
 	rho_in = convert(Array{ComplexF64,2},rho_in)
 	Gamma = convert(Array{ComplexF64,3},Gamma)
@@ -121,7 +121,7 @@ function me_solve_H_time_dependent(rho_in::Array{T1,2},Hops::Array{T5,3},Hfuncs:
     end
 
 	if adapt
-		sol = solve(prob, alg, saveat = tstep, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2])
+		sol = solve(prob, alg, saveat = tstep, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2], maxiters=iter_num)
 	else
 		if tstep < δt && override == false
 			error("You are using a fixed-timestep solver and the save timestep is smaller than solver timestep. This is probably a bad idea. If you insist, set override = true in the input arguments to override this error checking.")
