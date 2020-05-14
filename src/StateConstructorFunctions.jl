@@ -218,7 +218,7 @@ KEYWORD OPTIONAL
 Output:
     H: full Hamiltonian of the network
 """
-function create_Qubit_network(freqs::Vector{Float64},couple::Array{T,2};type = "flipflop",conv = 1) where {T <: Number}
+function create_Qubit_network(freqs::Vector{Float64},couple::Array{T,2};Ctype::String = "flipflop",conv::Int = 1) where {T <: Number}
 
     num = length(freqs)
     X, Y, Z, lower, raise = create_Qubit(conv)
@@ -226,7 +226,7 @@ function create_Qubit_network(freqs::Vector{Float64},couple::Array{T,2};type = "
     H = zeros(2^num,2^num)
 
     # Coupling
-    if type == "XX"
+    if Ctype == "XX"
         for jj = 1:1:num
             for kk = (jj+1):1:num
                 if abs(couple[jj,kk]) > 1e-10 && imag(couple[jj,kk]) < 1e-10
@@ -238,7 +238,7 @@ function create_Qubit_network(freqs::Vector{Float64},couple::Array{T,2};type = "
             end
         end
 
-    elseif type == "YY"
+    elseif Ctype == "YY"
         for jj = 1:1:num
             for kk = (jj+1):1:num
                 if abs(couple[jj,kk]) > 1e-10 && imag(couple[jj,kk]) < 1e-10
@@ -250,7 +250,7 @@ function create_Qubit_network(freqs::Vector{Float64},couple::Array{T,2};type = "
             end
         end
 
-    elseif type == "ZZ"
+    elseif Ctype == "ZZ"
         for jj = 1:1:num
             for kk = (jj+1):1:num
                 if abs(couple[jj,kk]) > 1e-10 && imag(couple[jj,kk]) < 1e-10
@@ -285,13 +285,13 @@ function create_Qubit_network(freqs::Vector{Float64},couple::Array{T,2};type = "
 end
 
 # In place version of above
-function create_Qubit_network(H::Array{T1,2},freqs::Vector{Float64},couple::Array{T2,2};type = "flipflop",conv = 1) where {T1 <: Number, T2 <: Number}
+function create_Qubit_network(H::Array{T1,2},freqs::Vector{Float64},couple::Array{T2,2};Ctype::String = "flipflop",conv::Int = 1) where {T1 <: Number, T2 <: Number}
 
     num = length(freqs)
     X, Y, Z, lower, raise = create_Qubit(conv)
 
     # Coupling
-    if type == "XX"
+    if Ctype == "XX"
         for jj = 1:1:num
             for kk = (jj+1):1:num
                 if abs(couple[jj,kk]) > 1e-10 && imag(couple[jj,kk]) < 1e-10
@@ -300,7 +300,7 @@ function create_Qubit_network(H::Array{T1,2},freqs::Vector{Float64},couple::Arra
             end
         end
 
-    elseif type == "YY"
+    elseif Ctype == "YY"
         for jj = 1:1:num
             for kk = (jj+1):1:num
                 if abs(couple[jj,kk]) > 1e-10 && imag(couple[jj,kk]) < 1e-10
@@ -309,7 +309,7 @@ function create_Qubit_network(H::Array{T1,2},freqs::Vector{Float64},couple::Arra
             end
         end
 
-    elseif type == "ZZ"
+    elseif Ctype == "ZZ"
         for jj = 1:1:num
             for kk = (jj+1):1:num
                 if abs(couple[jj,kk]) > 1e-10 && imag(couple[jj,kk]) < 1e-10
