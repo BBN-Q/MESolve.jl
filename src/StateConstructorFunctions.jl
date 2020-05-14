@@ -93,8 +93,8 @@ Input arguments:
     dim: Hilbert space dimesnion of the oscillators
     freqs: frequencies of the oscillators
     couple: matrix of tunnel couplings (beamsplitter interaction) between the HOs. Only the upper triangle is used, and the diagonal should be zero. For row index j and column index k, couple[j,k] is the rate for the operator raise_j ⊗ lower_k
-    sqz: matrix of squeezing interaction rates. Only the upper triangle is used, with the diagonal describing single-mode, and the off-diagonal two-mode squeezing. For row index j and column index k, couple[j,k] is the rate for the operator raise_j ⊗ raise_k
-    kerr: matrix of the self and cross Kerr interaction rates. Only the upper triangle is used with the diagonal describing self, and the off-diagonal cross Kerr. For row index j and column index k, couple[j,k] is the rate for the operator N_j ⊗ N_k. Note that this is NOT NORMAL ORDERED for j = k
+    sqz: matrix of squeezing interaction rates. Only the upper triangle is used, with the diagonal describing single-mode, and the off-diagonal two-mode squeezing. For row index j and column index k, sqz[j,k] is the rate for the operator raise_j ⊗ raise_k
+    kerr: matrix of the self and cross Kerr interaction rates. Only the upper triangle is used with the diagonal describing self, and the off-diagonal cross Kerr. For row index j and column index k, kerr[j,k] is the rate for the operator N_j ⊗ N_k. Note that this is NOT NORMAL ORDERED for j = k
 Output:
     H: full Hamiltonian of the network
 """
