@@ -174,17 +174,57 @@ function dRho_vec(out_vec::Array{T,1},rho_v::Array{ComplexF64,1},H::Array{Comple
 end
 
 """
-# In place time dependent covariance matrix
+# In place time independent covariance matrix
 """
-function dCV(out::Array{T,2},C::Array{ComplexF64,2},h::Function,t::AbstractFloat,h_tempL::Array{Float64,2}) where {T <: Number}
-    h_tempL[:,:] = h(t)
-    out[:,:] = h_tempL*C + C*transpose(h_tempL[:,:])
+function dCV(out::Array{T,2},C::Array{ComplexF64,2},M::Array{Float64,2},Z::Array{ComplexF64,2},t::AbstractFloat,M_temp::Array{Float64,2}) where {T <: Number}
+    out[:,:] = M*C + C*transpose(M) + Z
     nothing
 end
 
-function d_av(out::Vector{Float64},av_vec::Vector{Float64},M::Function,t::AbstractFloat,drv::Function,M_temp::Array{Float64,2},drv_temp::Array{Float64,1})
-    M_temp[:,:] = M(t)
-    drv_temp[:] = drv(t)
-    out[:] = M_temp*av_vec - drv_temp
+"""
+# In place time independent average vector
+"""
+function d_av(out::Vector{Float64},av_vec::Vector{Float64},M::Array{Float64,2},drv::Array{Float64,1},t::AbstractFloat)
+    out[:] = M*av_vec + drv
+    nothing
+end
+
+
+"""
+# In place time dependent covariance matrix
+"""
+# function dCV(out::Array{T,2},C::Array{ComplexF64,2},h::Function,t::AbstractFloat,h_tempL::Array{Float64,2}) where {T <: Number}
+#     h_tempL[:,:] = h(t)
+#     out[:,:] = h_tempL*C + C*transpose(h_tempL[:,:])
+#     nothing
+# end
+
+# New version
+function dCV(out::Array{T,2},C::Array{ComplexF64,2},M::Function,Z::Array{ComplexF64,2},t::AbstractFloat,M_temp::Array{Float64,2}) where {T <: Number}
+    M(M_temp,t)
+    out[:,:] = M_temp*C + C*transpose(M_temp[:,:]) + Z
+    nothing
+end
+
+# function d_av(out::Vector{Float64},av_vec::Vector{Float64},M::Function,t::AbstractFloat,drv::Function,M_temp::Array{Float64,2},drv_temp::Array{Float64,1})
+#     M_temp[:,:] = M(t)
+#     drv_temp[:] = drv(t)
+#     out[:] = M_temp*av_vec - drv_temp
+#     nothing
+# end
+
+"""
+# In place time dependent average vector
+"""
+function d_av(out::Vector{Float64},av_vec::Vector{Float64},M::Array{Float64,2},drv::Function,t::AbstractFloat,drv_temp::Array{Float64,1})
+    drv(drv_temp,t)
+    out[:] = M*av_vec + drv_temp
+    nothing
+end
+
+function d_av(out::Vector{Float64},av_vec::Vector{Float64},M::Function,drv::Function,t::AbstractFloat,M_temp::Array{Float64,2},drv_temp::Array{Float64,1})
+    M(M_temp,t)
+    drv(drv_temp,t)
+    out[:] = M_temp*av_vec + drv_temp
     nothing
 end

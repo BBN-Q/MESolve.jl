@@ -27,11 +27,12 @@ There are 5 main functions to solve master equations:
 
 These output an array of density matrices (solution of the master equation as a function of time), and an array of the times of solution.
 
-There is 1 function to solve covaraiance matrix differential equations:
+There are 2 functions to solve covaraiance matrix differential equations for Gaussian CV systems:
 
-* CV_solve_full_time_dependent() : Time-dependent Hamiltonian, decay rate, and coherent drive.
+* CV_solve_time_independent() : Time-independent Hamiltonian, and dissipation.
+* CV_solve_time_dependent() : Time-dependent Hamiltonian (both full time-dependent, and time-dependent linear terms only are possible), and time-independent dissipation.
 
-This outputs an array of covariance matrices and an array of average value vectors (solutions as a function of time), and arrays of the times of solution.
+This outputs an array of covariance matrices and an array of average value vectors (solutions as a function of time), and arrays of the times of solution. Both functions have various possible input styles, including describing the Hamiltonian in the position/momentum operators basis or the lowering/raising operator basis.
 
 See source code for more details, including full list of input arguments.
 

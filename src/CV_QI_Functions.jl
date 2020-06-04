@@ -75,12 +75,12 @@ function husimi_Q_pw(rho_in::Array{T1,2},xgrid::Array{Float64,1},ygrid::Array{Fl
     return Q
 end
 
-"""
-This function creates the coherent part of a Hamiltonian term in the covariance matrix differential equation.
-Input Arguments:
-    freq: Frequency of the oscillator.
-    sqz: Two-photon (parametric) drive complex amplitude (can be time-dependent)
-"""
-function create_h_C(freq::Float64,sqz::Function,t::AbstractFloat)
-    return [imag(sqz(t)) (freq - real(sqz(t)));-(freq + real(sqz(t))) -imag(sqz(t))]
-end
+# """
+# This function creates the coherent part of a Hamiltonian term in the covariance matrix differential equation.
+# Input Arguments:
+#     freq: Frequency of the oscillator.
+#     sqz: Two-photon (parametric) drive complex amplitude (can be time-dependent)
+# """
+# function create_h_C(freq::Float64,sqz::Function,t::AbstractFloat)
+#     return [imag(sqz(t)) (freq - real(sqz(t)));-(freq + real(sqz(t))) -imag(sqz(t))]
+# end

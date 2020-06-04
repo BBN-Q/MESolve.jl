@@ -270,50 +270,50 @@ return tvec, rho_out
 end
 
 
-"""
-Time dependent solver for Gaussian continuous variable systems using the covariance matrix approach. Defined in terms of the canonical X and P quadratures, the covariance matrix elements are defined by
-	C_ab = <O_aO_b> - <O_a><O_b> where vec(O) = [X,P] with
-	X = (a + a^†)/√2, P = -i(a - a^†)/√2 with a the lowering operator of a harmonic oscilaltor.
-Input Parameters:
-REQUIRED
-	C_in: Array 2 x 2, initial condition for the covariance matrix
-	a_in: vector 2 x 1, initial condition for the average value vector [<X>,<P>]
-	h: Function that returnas as output a matrix 2 x 2, Hamiltonian evolution term for the covariance matrix. For H = ω a^†a + (λa^2 + conj(λ)a^†^2)/2, h = [Im(λ), (ω - Re(λ);-(ω + Re(λ)), -Im(λ)].
-		Can use h = create_h_C(ω(t),λ(t),t) to generate the correct h.
-	drv: Function that returns as output a vector 2 x 1, linear drive term. For H = αa + conj(α)a^†, drv = √2[Im(α), Re(α)]
-	t0: float, start time
-	tf: float, end time
-KEYWORD OPTIONAL
-	tstep: float, time steps at which output data should be saved
-	tols: 2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
-	alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
-"""
-
-function CV_solve_full_time_dependent(C_in::Array{T,2},a_in::Vector{Float64},h::Function,drv::Function,t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5()) where {T <: Number}
-
-	C_in = convert(Array{ComplexF64,2}, C_in)
-	if tstep < 1e-10
-        tstep = (tf-t0)./100
-    end
-	tspan = (t0,tf)
-
-	# Covariance matrix
-	h_tempL = Array{Float64}(undef,size(C_in,1),size(C_in,2))
-	# h_tempR = Array{Float64}(undef,size(C_in,1),size(C_in,2))
-    dif_C(du,u,p,t) = dCV(du,u,h,t,h_tempL) # In place
-
-    prob_C = ODEProblem{true}(dif_C,C_in,tspan)
-
-    sol_C = solve(prob_C, alg, saveat = tstep, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2])
-
-	# Average
-	h_temp = Array{Float64}(undef,size(C_in,1),size(C_in,2))
-	drv_temp = Array{Float64}(undef,size(a_in,1))
-	dif_a(du,u,p,t) = d_av(du,u,h,t,drv,h_temp,drv_temp) # In place
-
-    prob_a = ODEProblem{true}(dif_a,a_in,tspan)
-
-    sol_a = solve(prob_a, alg, saveat = tstep, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2])
-
-return sol_C.t, sol_C.u, sol_a.t, sol_a.u
-end
+# """
+# Time dependent solver for Gaussian continuous variable systems using the covariance matrix approach. Defined in terms of the canonical X and P quadratures, the covariance matrix elements are defined by
+# 	C_ab = <O_aO_b> - <O_a><O_b> where vec(O) = [X,P] with
+# 	X = (a + a^†)/√2, P = -i(a - a^†)/√2 with a the lowering operator of a harmonic oscilaltor.
+# Input Parameters:
+# REQUIRED
+# 	C_in: Array 2 x 2, initial condition for the covariance matrix
+# 	a_in: vector 2 x 1, initial condition for the average value vector [<X>,<P>]
+# 	h: Function that returnas as output a matrix 2 x 2, Hamiltonian evolution term for the covariance matrix. For H = ω a^†a + (λa^2 + conj(λ)a^†^2)/2, h = [Im(λ), (ω - Re(λ);-(ω + Re(λ)), -Im(λ)].
+# 		Can use h = create_h_C(ω(t),λ(t),t) to generate the correct h.
+# 	drv: Function that returns as output a vector 2 x 1, linear drive term. For H = αa + conj(α)a^†, drv = √2[Im(α), Re(α)]
+# 	t0: float, start time
+# 	tf: float, end time
+# KEYWORD OPTIONAL
+# 	tstep: float, time steps at which output data should be saved
+# 	tols: 2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
+# 	alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
+# """
+#
+# function CV_solve_full_time_dependent(C_in::Array{T,2},a_in::Vector{Float64},h::Function,drv::Function,t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5()) where {T <: Number}
+#
+# 	C_in = convert(Array{ComplexF64,2}, C_in)
+# 	if tstep < 1e-10
+#         tstep = (tf-t0)./100
+#     end
+# 	tspan = (t0,tf)
+#
+# 	# Covariance matrix
+# 	h_tempL = Array{Float64}(undef,size(C_in,1),size(C_in,2))
+# 	# h_tempR = Array{Float64}(undef,size(C_in,1),size(C_in,2))
+#     dif_C(du,u,p,t) = dCV(du,u,h,t,h_tempL) # In place
+#
+#     prob_C = ODEProblem{true}(dif_C,C_in,tspan)
+#
+#     sol_C = solve(prob_C, alg, saveat = tstep, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2])
+#
+# 	# Average
+# 	h_temp = Array{Float64}(undef,size(C_in,1),size(C_in,2))
+# 	drv_temp = Array{Float64}(undef,size(a_in,1))
+# 	dif_a(du,u,p,t) = d_av(du,u,h,t,drv,h_temp,drv_temp) # In place
+#
+#     prob_a = ODEProblem{true}(dif_a,a_in,tspan)
+#
+#     sol_a = solve(prob_a, alg, saveat = tstep, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2])
+#
+# return sol_C.t, sol_C.u, sol_a.t, sol_a.u
+# end
