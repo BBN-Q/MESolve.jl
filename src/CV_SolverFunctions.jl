@@ -268,7 +268,7 @@ function CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},ω::V
 	d = zeros(Float64,size(C_in,1))
 
 	for jj = 1:1:Num
-		for kk = (ii+1):1:Num
+		for kk = (jj+1):1:Num
 			# XX
 			h[2*kk-1,2*jj-1] = 2*(real(g[kk,jj]) + real(λ[kk,jj]))
 
@@ -332,7 +332,7 @@ function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},ω::Vec
 	h = zeros(Float64,size(C_in,1),size(C_in,2))
 
 	for jj = 1:1:Num
-		for kk = (ii+1):1:Num
+		for kk = (jj+1):1:Num
 			# XX
 			h[2*kk-1,2*jj-1] = 2*(real(g[kk,jj]) + real(λ[kk,jj]))
 
@@ -408,7 +408,7 @@ function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},ω::Fun
 		λs[:,:] = λ(t)
 
 		for jj = 1:1:Num
-			for kk = (ii+1):1:Num
+			for kk = (jj+1):1:Num
 				# XX
 				temp_h[2*kk-1,2*jj-1] = 2*(real(gs[kk,jj]) + real(λs[kk,jj]))
 
