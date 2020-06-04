@@ -292,7 +292,7 @@ function CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},ω::V
 
 	d[:] = sqrt(2)*vec([real.(α) -imag.(α)]')[:]
 
-	return CV_solve_time_dependent(C_in,a_in,h,d,Z,t0,tf; tstep=tstep,tols=tols,alg=alg)
+	return CV_solve_time_independent(C_in,a_in,h,d,Z,t0,tf; tstep=tstep,tols=tols,alg=alg)
 end
 
 """
