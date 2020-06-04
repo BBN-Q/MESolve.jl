@@ -176,7 +176,7 @@ end
 """
 # In place time independent covariance matrix
 """
-function dCV(out::Array{T,2},C::Array{ComplexF64,2},M::Array{Float64,2},Z::Array{ComplexF64,2},t::AbstractFloat,M_temp::Array{Float64,2}) where {T <: Number}
+function dCV(out::Array{T,2},C::Array{ComplexF64,2},M::Array{Float64,2},Z::Array{ComplexF64,2},t::AbstractFloat) where {T <: Number}
     out[:,:] = M*C + C*transpose(M) + Z
     nothing
 end
