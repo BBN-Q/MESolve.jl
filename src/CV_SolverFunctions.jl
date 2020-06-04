@@ -270,16 +270,16 @@ function CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},ω::V
 	for jj = 1:1:Num
 		for kk = (jj+1):1:Num
 			# XX
-			h[2*kk-1,2*jj-1] = 2*(real(g[kk,jj]) + real(λ[kk,jj]))
+			h[2*kk-1,2*jj-1] = (real(g[kk,jj]) + real(λ[kk,jj]))
 
 			#XY
-			h[2*kk-1,2*jj] = 2*(imag(λ[kk,jj]) - imag(g[kk,jj]))
+			h[2*kk-1,2*jj] = (imag(λ[kk,jj]) - imag(g[kk,jj]))
 
 			#YX
-			h[2*kk,2*jj-1] = 2*(imag(λ[kk,jj]) + imag(g[kk,jj]))
+			h[2*kk,2*jj-1] = (imag(λ[kk,jj]) + imag(g[kk,jj]))
 
 			#YY
-			h[2*kk,2*jj] = 2*(real(g[kk,jj]) - real(λ[kk,jj]))
+			h[2*kk,2*jj] = (real(g[kk,jj]) - real(λ[kk,jj]))
 		end
 
 		#YX same
@@ -334,16 +334,16 @@ function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},ω::Vec
 	for jj = 1:1:Num
 		for kk = (jj+1):1:Num
 			# XX
-			h[2*kk-1,2*jj-1] = 2*(real(g[kk,jj]) + real(λ[kk,jj]))
+			h[2*kk-1,2*jj-1] = (real(g[kk,jj]) + real(λ[kk,jj]))
 
 			#XY
-			h[2*kk-1,2*jj] = 2*(imag(λ[kk,jj]) - imag(g[kk,jj]))
+			h[2*kk-1,2*jj] = (imag(λ[kk,jj]) - imag(g[kk,jj]))
 
 			#YX
-			h[2*kk,2*jj-1] = 2*(imag(λ[kk,jj]) + imag(g[kk,jj]))
+			h[2*kk,2*jj-1] = (imag(λ[kk,jj]) + imag(g[kk,jj]))
 
 			#YY
-			h[2*kk,2*jj] = 2*(real(g[kk,jj]) - real(λ[kk,jj]))
+			h[2*kk,2*jj] = (real(g[kk,jj]) - real(λ[kk,jj]))
 		end
 
 		#YX same
@@ -410,16 +410,16 @@ function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},ω::Fun
 		for jj = 1:1:Num
 			for kk = (jj+1):1:Num
 				# XX
-				temp_h[2*kk-1,2*jj-1] = 2*(real(gs[kk,jj]) + real(λs[kk,jj]))
+				temp_h[2*kk-1,2*jj-1] = (real(gs[kk,jj]) + real(λs[kk,jj]))
 
 				#XY
-				temp_h[2*kk-1,2*jj] = 2*(imag(λs[kk,jj]) - imag(gs[kk,jj]))
+				temp_h[2*kk-1,2*jj] = (imag(λs[kk,jj]) - imag(gs[kk,jj]))
 
 				#YX
-				temp_h[2*kk,2*jj-1] = 2*(imag(λs[kk,jj]) + imag(gs[kk,jj]))
+				temp_h[2*kk,2*jj-1] = (imag(λs[kk,jj]) + imag(gs[kk,jj]))
 
 				#YY
-				temp_h[2*kk,2*jj] = 2*(real(gs[kk,jj]) - real(λs[kk,jj]))
+				temp_h[2*kk,2*jj] = (real(gs[kk,jj]) - real(λs[kk,jj]))
 			end
 
 			#YX same
