@@ -260,7 +260,7 @@ KEYWORD OPTIONAL
 	tols: 2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
 	alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
 """
-function CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},ω::Vector{Float64},g::Array{T2,2},λ::Array{T3,2},α::Array{T4,2},Z::Array{T5,2},t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: Number, T5 <: Number}
+function CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},ω::Vector{Float64},g::Array{T2,2},λ::Array{T3,2},α::Array{T4,1},Z::Array{T5,2},t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: Number, T5 <: Number}
 
 	# Conert to X,P basis
 	Num = length(ω)
