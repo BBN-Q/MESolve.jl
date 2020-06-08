@@ -43,6 +43,13 @@ function test_solver_args()
 end
 
 function cv_tests()
+
+	a_in = zeros(6)
+	C_in = zeros(ComplexF64,6,6)
+	for ii = 1:2:6
+    	C_in[ii:(ii+1),ii:(ii+1)] = [1. 1im;-1im 1.0]/2
+	end
+
 	ωs = [1.0,2.0,1.0]
 	ηs = [0.2,0.1,0.2]
 	γs = -ηs + [0.05,0.05,0.05]

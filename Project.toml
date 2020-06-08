@@ -1,6 +1,6 @@
 name = "MESolve"
 uuid = "93ff5324-56f4-11e9-229d-9db60c26fd91"
-authors = ["Luke Govia <lgovia@bbn.com>"]
+authors = ["Luke Govia <luke.c.govia@raytheon.com>"]
 version = "1.0.0"
 
 [deps]
@@ -13,4 +13,3 @@ DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
 
 [targets]
 test = ["Test", "DifferentialEquations"]
-
