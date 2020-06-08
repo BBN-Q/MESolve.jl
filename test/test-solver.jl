@@ -21,7 +21,7 @@ function test_solver_args()
 	tvec2, rho_out2 = MESolve.me_solve_time_independent(rho_in, H, gamma, rates, t0, tf, tstep = tstep, tols = tols, alg = DP5())
 
 	# test time dependent solvers
-	Ht(t) = cos(t)*H
+	Ht(t) = exp(-t)*H
 
 	function H_ip(Htemp::AbstractArray,t::AbstractFloat)
 		Htemp[:,:] = Ht(t)[:,:]
