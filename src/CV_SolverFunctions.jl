@@ -228,6 +228,8 @@ end
 
 """
 Input in the a,a^† basis
+
+NOTE: Due to the overhead of converting from the a,a^† basis to the X, P basis, benchmarking has these implementations about a factor of 2 slower, and requiring about twice the memory than the X, P basis implementations. 
 """
 
 """
