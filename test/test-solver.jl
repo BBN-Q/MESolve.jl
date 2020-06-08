@@ -1,4 +1,4 @@
-using Test, DifferentialEquations
+using Test, DifferentialEquations, LinearAlgebra
 
 function test_solver_args()
 	# test time_independant_solver
@@ -24,7 +24,7 @@ function test_solver_args()
 	Ht(t) = cos(t)*H
 
 	function H_ip(Htemp::AbstractArray,t::AbstractFloat)
-		Htemp[:,:] = H(t)[:,:]
+		Htemp[:,:] = Ht(t)[:,:]
 		nothing
 	end
 	rt(t) = exp(-t)*rates
@@ -49,7 +49,7 @@ function cv_tests()
 	λ_sm = 0.1
 
 	h = [ωs[1] 0. 0. 0. 0. 0.; 0. ωs[1] 0. 0. 0. 0.; ηs[1] 0. (ωs[2] + 2*λ_sm) 0. 0. 0.; 0. γs[1] 0. (ωs[2] - 2*λ_sm) 0. 0.; ηs[2] 0. ηs[3] 0. ωs[3] 0.; 0. γs[2] 0. γs[3] 0. ωs[3]]
-	h = h + h' -diagm(diag(h))
+	h = h + h' -LinearAlgebra.diagm(LinearAlgebra.diag(h))
 
 	αs = [0.1,0.0,0.2]
 	βs = [0.,0.1,0.];
