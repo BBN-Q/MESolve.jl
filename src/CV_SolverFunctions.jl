@@ -229,7 +229,7 @@ end
 """
 Input in the a,a^† basis
 
-NOTE: Due to the overhead of converting from the a,a^† basis to the X, P basis, benchmarking has these implementations about a factor of 2 slower, and requiring about twice the memory than the X, P basis implementations. 
+NOTE: Due to the overhead of converting from the a,a^† basis to the X, P basis, benchmarking has these implementations at least a factor of 2 slower for the time dependent solvers, and requiring at least twice the memory than the X, P basis implementations.
 """
 
 """
@@ -404,10 +404,46 @@ function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},ω::Fun
 	gs1 = zeros(Float64,Num,Num)
 	λs1 = zeros(Float64,Num,Num)
 
-	function h(t::AbstractFloat;temp_h=temp_h1,gs=gs1,λs=λs1)
+	# function h(t::AbstractFloat;temp_h=temp_h1,gs=gs1,λs=λs1)
+	# 	# fill!(temp_h,0.)
+	# 	gs[:,:] = g(t)
+	# 	λs[:,:] = λ(t)
+	#
+	# 	for jj = 1:1:Num
+	# 		for kk = (jj+1):1:Num
+	# 			# XX
+	# 			temp_h[2*kk-1,2*jj-1] = (real(gs[kk,jj]) + real(λs[kk,jj]))
+	#
+	# 			#XY
+	# 			temp_h[2*kk-1,2*jj] = (imag(λs[kk,jj]) - imag(gs[kk,jj]))
+	#
+	# 			#YX
+	# 			temp_h[2*kk,2*jj-1] = (imag(λs[kk,jj]) + imag(gs[kk,jj]))
+	#
+	# 			#YY
+	# 			temp_h[2*kk,2*jj] = (real(gs[kk,jj]) - real(λs[kk,jj]))
+	# 		end
+	#
+	# 		#YX same
+	# 		temp_h[2*jj,2*jj-1] = 2*imag(λs[jj,jj])
+	# 	end
+	#
+	# 	temp_h[:,:] = temp_h[:,:] + temp_h[:,:]'
+	#
+	# 	# for ii = 1:1:Num
+	# 	# 	temp_h[2*ii-1,2*ii-1] = ω(t)[ii] + 2*real(λ(t)[ii,ii])
+	# 	# 	temp_h[2*ii,2*ii] = ω(t)[ii] - 2*real(λ(t)[ii,ii])
+	# 	# end
+	# 	temp_h[diagind(temp_h)] = vec([(ω(t)+2*real(diag(λs))) (ω(t)-2*real(diag(λs)))]')[:]
+	#
+	# 	return temp_h
+	# end
+
+	function h(t::AbstractFloat)
 		# fill!(temp_h,0.)
-		gs[:,:] = g(t)
-		λs[:,:] = λ(t)
+		gs = g(t)
+		λs = λ(t)
+		temp_h = zeros(size(gs,1)*2,size(gs,2)*2)
 
 		for jj = 1:1:Num
 			for kk = (jj+1):1:Num

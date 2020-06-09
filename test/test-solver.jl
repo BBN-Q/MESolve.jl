@@ -67,23 +67,21 @@ function cv_tests()
 	L3 = [0;0;0;0;1;1im]/sqrt(2)
 	Z = 0.05*(conj.(L1)*transpose(L1) + conj.(L2)*transpose(L2) + conj.(L3)*transpose(L3))
 
-	tC1, C_out1, ta1, a_out1 = CV_solve_time_independent(C_in,a_in,h,d,Z,0.0,10.0);
-
 	αv = (αs-1im*βs)/sqrt(2)
 	g = [0. 0. 0.; ηs[1]+γs[1] 0. 0.; ηs[2]+γs[2] ηs[3]+γs[3] 0.]/2
 	λ = [0. 0. 0.; ηs[1]-γs[1] 2*λ_sm 0.; ηs[2]-γs[2] ηs[3]-γs[3] 0.]/2
 
-	tC2, C_out2, ta2, a_out2 = CV_solve_time_independent(C_in,a_in,ωs,g,λ,αv,Z,0.0,10.0);
-
 	hf(t) = h + 0.01*t*h
 	df(t) = d + 0.01*t*d
-
-	tC3, C_out3, ta3, a_out3 = CV_solve_time_dependent(C_in,a_in,hf,df,Z,0.0,10.0);
 
 	ωsf(t) = ωs + 0.01*t*ωs
 	gf(t) = g + 0.01*t*g
 	λf(t) = λ + 0.01*t*λ
 	αvf(t) = αv + 0.01*t*αv
+
+	tC1, C_out1, ta1, a_out1 = CV_solve_time_independent(C_in,a_in,h,d,Z,0.0,10.0);
+	tC2, C_out2, ta2, a_out2 = CV_solve_time_independent(C_in,a_in,ωs,g,λ,αv,Z,0.0,10.0);
+	tC3, C_out3, ta3, a_out3 = CV_solve_time_dependent(C_in,a_in,hf,df,Z,0.0,10.0);
 
 	tC4, C_out4, ta4, a_out4 = CV_solve_time_dependent(C_in,a_in,ωsf,gf,λf,αvf,Z,0.0,10.0);
 end
