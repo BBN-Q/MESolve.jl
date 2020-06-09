@@ -14,7 +14,7 @@ function test_solver_args()
 	t0 = 0.0
 	tf = 1.0
 	tstep = 0.01
-	tols = [1e-4,1e-2]
+	tols = [1e-7,1e-4]
 	rates = [1.,1.,1.,1.]
 
 	tvec1, rho_out1 = MESolve.me_solve_time_independent(rho_in, H, gamma, rates, t0, tf, tstep = tstep, tols = tols)
