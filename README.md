@@ -1,6 +1,6 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3743496.svg)](https://doi.org/10.5281/zenodo.3743496)
 
-[![Build Status](https://travis-ci.org/BBN-Q/MESolve.jl.svg?branch=master)](https://travis-ci.org/BBN-Q/MESolve.jl)
+![Build Status](https://github.com/BBN-Q/MEsolve.jl/workflows/CI/badge.svg)
 
 MESolve.jl is a Lindbald master equation solver written in Julia. It supports time-independent evolution, as well as time-dependent evolution with a time-dependent Hamiltonian and/or time-dependent Lindblad dissipative rates. The Lindblad equation is assumed to be in diagonal form.
 
