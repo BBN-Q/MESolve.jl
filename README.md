@@ -2,6 +2,8 @@
 
 ![Build Status](https://github.com/BBN-Q/MEsolve.jl/workflows/CI/badge.svg)
 
+[![codecov](https://codecov.io/gh/BBN-Q/MESolve.jl/branch/master/graph/badge.svg?token=ASQEKQPLXY)](https://codecov.io/gh/BBN-Q/MESolve.jl)
+
 MESolve.jl is a Lindbald master equation solver written in Julia. It supports time-independent evolution, as well as time-dependent evolution with a time-dependent Hamiltonian and/or time-dependent Lindblad dissipative rates. The Lindblad equation is assumed to be in diagonal form.
 
 MESolve.jl also provides support for solving covariance matrix differential equations for Gaussian continuous variable systems, as well as helper functions to create common discrete and continuous variable systems.
