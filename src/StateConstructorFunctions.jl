@@ -22,25 +22,28 @@ end
 """
 This function creates the Hamiltonian for a Harmonic oscillator network.
 Input arguments:
-    dim: Hilbert space dimesnion of the oscillators
+    dim: array of the Hilbert space dimensions of the oscillators
     freqs: frequencies of the oscillators
     couple: matrix of tunnel couplings (beamsplitter interaction) between the HOs. Only the upper triangle is used, and the diagonal should be zero. For row index j and column index k, couple[j,k] is the rate for the operator raise_j ⊗ lower_k
 Output:
     H: full Hamiltonian of the network
 """
-function create_HO_network(dim::Int,freqs::Vector{Float64},couple::Array{T,2}) where {T <: Number}
+function create_HO_network(dim::Array{Int},freqs::Vector{Float64},couple::Array{T,2}) where {T <: Number}
 
     num = length(freqs)
-    (lower, raise, N) = create_HO(dim)
 
-    H = zeros(dim^num,dim^num)
+    H = zeros(prod(dim),prod(dim))
 
     # Tunnel coupling (note the normal ordering)
     for jj = 1:1:num
+        ~, raise1, ~ = create_HO(dim[jj])
         for kk = (jj+1):1:num
             if abs(couple[jj,kk]) > 1e-10
-                raise_jj = kron(Matrix{ComplexF64}(I,dim^(jj-1),dim^(jj-1)),kron(raise,Matrix{ComplexF64}(I,dim^(num-jj),dim^(num-jj))))
-                lower_kk = kron(Matrix{ComplexF64}(I,dim^(kk-1),dim^(kk-1)),kron(lower,Matrix{ComplexF64}(I,dim^(num-kk),dim^(num-kk))))
+                lower2, ~, ~ = create_HO(dim[kk])
+                # raise_jj = kron(Matrix{ComplexF64}(I,dim^(jj-1),dim^(jj-1)),kron(raise,Matrix{ComplexF64}(I,dim^(num-jj),dim^(num-jj))))
+                raise_jj = kron(Matrix{ComplexF64}(I,prod(dim[1:jj-1]),prod(dim[1:jj-1])),kron(raise1,Matrix{ComplexF64}(I,prod(dim[(jj+1):end]),prod(dim[(jj+1):end]))))
+                # lower_kk = kron(Matrix{ComplexF64}(I,dim^(kk-1),dim^(kk-1)),kron(lower,Matrix{ComplexF64}(I,dim^(num-kk),dim^(num-kk))))
+                lower_kk = kron(Matrix{ComplexF64}(I,prod(dim[1:kk-1]),prod(dim[1:kk-1])),kron(lower2,Matrix{ComplexF64}(I,prod(dim[(jj+1):end]),prod(dim[(jj+1):end]))))
 
                 H = H + couple[jj,kk]*raise_jj*lower_kk
             end
@@ -51,13 +54,14 @@ function create_HO_network(dim::Int,freqs::Vector{Float64},couple::Array{T,2}) w
 
     # Self Hamiltonians
     for ii = 1:1:num
-        H = H + freqs[ii]*kron(Matrix{ComplexF64}(I,dim^(ii-1),dim^(ii-1)),kron(N,Matrix{ComplexF64}(I,dim^(num-ii),dim^(num-ii))))
+        H = H + freqs[ii]*kron(Matrix{ComplexF64}(I,prod(dim[1:ii-1]),prod(dim[1:ii-1])),kron(N,Matrix{ComplexF64}(I,prod(dim[(ii+1):end]),prod(dim[(ii+1):end]))))
     end
 
     return H
 
 end
 
+# To be updated
 # In place version of the above
 function create_HO_network(H::Array{T1,2},dim::Int,freqs::Vector{Float64},couple::Array{T2,2}) where {T1 <: Number, T2 <: Number}
 
@@ -90,7 +94,7 @@ end
 """
 This function creates the Hamiltonian for a Kerr parametric oscillator network.
 Input arguments:
-    dim: Hilbert space dimesnion of the oscillators
+    dim: array of the Hilbert space dimensions of the oscillators
     freqs: frequencies of the oscillators
     couple: matrix of tunnel couplings (beamsplitter interaction) between the HOs. Only the upper triangle is used, and the diagonal should be zero. For row index j and column index k, couple[j,k] is the rate for the operator raise_j ⊗ lower_k
     sqz: matrix of squeezing interaction rates. Only the upper triangle is used, with the diagonal describing single-mode, and the off-diagonal two-mode squeezing. For row index j and column index k, sqz[j,k] is the rate for the operator raise_j ⊗ raise_k
@@ -98,27 +102,32 @@ Input arguments:
 Output:
     H: full Hamiltonian of the network
 """
-function create_KPO_network(dim::Int,freqs::Vector{Float64},couple::Array{T1,2},sqz::Array{T2,2},kerr::Array{Float64,2}) where {T1 <: Number, T2 <: Number}
+function create_KPO_network(dim::Array{Int},freqs::Vector{Float64},couple::Array{T1,2},sqz::Array{T2,2},kerr::Array{Float64,2}) where {T1 <: Number, T2 <: Number}
 
     num = length(freqs)
-    (lower, raise, N) = create_HO(dim)
+    # (lower, raise, N) = create_HO(dim)
 
-    H = zeros(dim^num,dim^num)
+    H = zeros(prod(dim),prod(dim))
 
     # Squeezing and Kerr (factor of 1/2 in Kerr term is to account for doing H + H' later)
     for jj = 1:1:num
+        ~, raise1, N1 = create_HO(dim[jj])
         for kk = jj:1:num
             if abs(sqz[jj,kk]) > 1e-10
-                raise_jj = kron(Matrix{ComplexF64}(I,dim^(jj-1),dim^(jj-1)),kron(raise,Matrix{ComplexF64}(I,dim^(num-jj),dim^(num-jj))))
-                raise_kk = kron(Matrix{ComplexF64}(I,dim^(kk-1),dim^(kk-1)),kron(raise,Matrix{ComplexF64}(I,dim^(num-kk),dim^(num-kk))))
+                ~, raise2, ~ = create_HO(dim[kk])
+                # raise_jj = kron(Matrix{ComplexF64}(I,dim^(jj-1),dim^(jj-1)),kron(raise,Matrix{ComplexF64}(I,dim^(num-jj),dim^(num-jj))))
+                raise_jj = kron(Matrix{ComplexF64}(I,prod(dim[1:jj-1]),prod(dim[1:jj-1])),kron(raise1,Matrix{ComplexF64}(I,prod(dim[(jj+1):end]),prod(dim[(jj+1):end]))))
+                # raise_kk = kron(Matrix{ComplexF64}(I,dim^(kk-1),dim^(kk-1)),kron(raise,Matrix{ComplexF64}(I,dim^(num-kk),dim^(num-kk))))
+                raise_kk = kron(Matrix{ComplexF64}(I,prod(dim[1:kk-1]),prod(dim[1:kk-1])),kron(raise2,Matrix{ComplexF64}(I,prod(dim[(kk+1):end]),prod(dim[(kk+1):end]))))
 
                 H = H + sqz[jj,kk]*raise_jj*raise_kk
             end
 
             if abs(kerr[jj,kk]) > 1e-10
 
-                N_jj = kron(Matrix{ComplexF64}(I,dim^(jj-1),dim^(jj-1)),kron(N,Matrix{ComplexF64}(I,dim^(num-jj),dim^(num-jj))))
-                N_kk = kron(Matrix{ComplexF64}(I,dim^(kk-1),dim^(kk-1)),kron(N,Matrix{ComplexF64}(I,dim^(num-kk),dim^(num-kk))))
+                ~, ~, N2 = create_HO(dim[kk])
+                N_jj = kron(Matrix{ComplexF64}(I,prod(dim[1:jj-1]),prod(dim[1:jj-1]),kron(N,Matrix{ComplexF64}(I,prod(dim[(jj+1):end]),prod(dim[(jj+1):end]))))
+                N_kk = kron(Matrix{ComplexF64}(I,prod(dim[1:kk-1]),prod(dim[1:kk-1])),kron(N,Matrix{ComplexF64}(I,prod(dim[(kk+1):end]),prod(dim[(kk+1):end]))))
 
                 H = H + kerr[jj,kk]*N_jj*N_kk/2  # This expression is NOT NORMAL ORDERED for jj = kk
             end
@@ -131,6 +140,7 @@ function create_KPO_network(dim::Int,freqs::Vector{Float64},couple::Array{T1,2},
 
 end
 
+# To be updated
 # In place version of the above
 function create_KPO_network(H::Array{T1,2},dim::Int,freqs::Vector{Float64},couple::Array{T2,2},sqz::Array{T3,2},kerr::Array{Float64,2}) where {T1 <: Number, T2 <: Number, T3 <: Number}
 
