@@ -54,7 +54,8 @@ function create_HO_network(dim::Array{Int},freqs::Vector{Float64},couple::Array{
 
     # Self Hamiltonians
     for ii = 1:1:num
-        H = H + freqs[ii]*kron(Matrix{ComplexF64}(I,prod(dim[1:ii-1]),prod(dim[1:ii-1])),kron(N,Matrix{ComplexF64}(I,prod(dim[(ii+1):end]),prod(dim[(ii+1):end]))))
+        ~, ~, N1 = create_HO(dim[ii])
+        H = H + freqs[ii]*kron(Matrix{ComplexF64}(I,prod(dim[1:ii-1]),prod(dim[1:ii-1])),kron(N1,Matrix{ComplexF64}(I,prod(dim[(ii+1):end]),prod(dim[(ii+1):end]))))
     end
 
     return H
@@ -126,8 +127,8 @@ function create_KPO_network(dim::Array{Int},freqs::Vector{Float64},couple::Array
             if abs(kerr[jj,kk]) > 1e-10
 
                 ~, ~, N2 = create_HO(dim[kk])
-                N_jj = kron(Matrix{ComplexF64}(I,prod(dim[1:jj-1]),prod(dim[1:jj-1]),kron(N,Matrix{ComplexF64}(I,prod(dim[(jj+1):end]),prod(dim[(jj+1):end]))))
-                N_kk = kron(Matrix{ComplexF64}(I,prod(dim[1:kk-1]),prod(dim[1:kk-1])),kron(N,Matrix{ComplexF64}(I,prod(dim[(kk+1):end]),prod(dim[(kk+1):end]))))
+                N_jj = kron(Matrix{ComplexF64}(I,prod(dim[1:jj-1]),prod(dim[1:jj-1])),kron(N1,Matrix{ComplexF64}(I,prod(dim[(jj+1):end]),prod(dim[(jj+1):end]))))
+                N_kk = kron(Matrix{ComplexF64}(I,prod(dim[1:kk-1]),prod(dim[1:kk-1])),kron(N2,Matrix{ComplexF64}(I,prod(dim[(kk+1):end]),prod(dim[(kk+1):end]))))
 
                 H = H + kerr[jj,kk]*N_jj*N_kk/2  # This expression is NOT NORMAL ORDERED for jj = kk
             end
