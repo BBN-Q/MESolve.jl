@@ -43,7 +43,7 @@ function create_HO_network(dim::Array{Int},freqs::Vector{Float64},couple::Array{
                 # raise_jj = kron(Matrix{ComplexF64}(I,dim^(jj-1),dim^(jj-1)),kron(raise,Matrix{ComplexF64}(I,dim^(num-jj),dim^(num-jj))))
                 raise_jj = kron(Matrix{ComplexF64}(I,prod(dim[1:jj-1]),prod(dim[1:jj-1])),kron(raise1,Matrix{ComplexF64}(I,prod(dim[(jj+1):end]),prod(dim[(jj+1):end]))))
                 # lower_kk = kron(Matrix{ComplexF64}(I,dim^(kk-1),dim^(kk-1)),kron(lower,Matrix{ComplexF64}(I,dim^(num-kk),dim^(num-kk))))
-                lower_kk = kron(Matrix{ComplexF64}(I,prod(dim[1:kk-1]),prod(dim[1:kk-1])),kron(lower2,Matrix{ComplexF64}(I,prod(dim[(jj+1):end]),prod(dim[(jj+1):end]))))
+                lower_kk = kron(Matrix{ComplexF64}(I,prod(dim[1:kk-1]),prod(dim[1:kk-1])),kron(lower2,Matrix{ComplexF64}(I,prod(dim[(kk+1):end]),prod(dim[(kk+1):end]))))
 
                 H = H + couple[jj,kk]*raise_jj*lower_kk
             end
