@@ -13,7 +13,7 @@ function create_HO(dim::Int)
 
     lower = zeros(dim,dim)
     for ii = 1:(dim-1)
-        lower[ii,ii+1] = sqrt(ii)
+        @inbounds lower[ii,ii+1] = sqrt(ii)
     end
 
     raise = lower'
@@ -53,7 +53,7 @@ function create_HO_network(dim::Array{Int},freqs::Vector{Float64},couple::Array{
                 # lower_kk = kron(Matrix{ComplexF64}(I,dim^(kk-1),dim^(kk-1)),kron(lower,Matrix{ComplexF64}(I,dim^(num-kk),dim^(num-kk))))
                 lower_kk = kron(Matrix{ComplexF64}(I,prod(dim[1:kk-1]),prod(dim[1:kk-1])),kron(lower2,Matrix{ComplexF64}(I,prod(dim[(kk+1):end]),prod(dim[(kk+1):end]))))
 
-                H = H + couple[jj,kk]*raise_jj*lower_kk
+                @inbounds H = H + couple[jj,kk]*raise_jj*lower_kk
             end
         end
     end
@@ -63,7 +63,7 @@ function create_HO_network(dim::Array{Int},freqs::Vector{Float64},couple::Array{
     # Self Hamiltonians
     for ii = 1:1:num
         ~, ~, N1 = create_HO(dim[ii])
-        H = H + freqs[ii]*kron(Matrix{ComplexF64}(I,prod(dim[1:ii-1]),prod(dim[1:ii-1])),kron(N1,Matrix{ComplexF64}(I,prod(dim[(ii+1):end]),prod(dim[(ii+1):end]))))
+        @inbounds H = H + freqs[ii]*kron(Matrix{ComplexF64}(I,prod(dim[1:ii-1]),prod(dim[1:ii-1])),kron(N1,Matrix{ComplexF64}(I,prod(dim[(ii+1):end]),prod(dim[(ii+1):end]))))
     end
 
     return H

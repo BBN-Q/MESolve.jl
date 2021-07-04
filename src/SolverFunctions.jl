@@ -38,10 +38,19 @@ function me_solve_time_independent(rho_in::Array{T1,2},
 								   tols::Vector{Float64}=[1e-6,1e-3],
 								   alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
 
-	rho_in = convert(Array{ComplexF64,2},rho_in)
-	H = convert(Array{ComplexF64,2},H)
-	Gamma = convert(Array{ComplexF64,3},Gamma)
-	rates = convert(Array{Float64,1},rates)
+	# Only convert if the type is wrong
+	if typeof(rho_in) != Array{ComplexF64,2} 
+		rho_in = convert(Array{ComplexF64,2},rho_in)
+	end
+	if typeof(H) != Array{ComplexF64,2} 
+		H = convert(Array{ComplexF64,2},H)
+	end
+	if typeof(Gamma) != Array{ComplexF64,3} 
+		Gamma = convert(Array{ComplexF64,3},Gamma)
+	end
+	if typeof(rates) != Array{Float64,1} 
+		rates = convert(Array{Float64,1},rates)
+	end
 
 	dRho_L = Array{ComplexF64}(undef,size(rho_in,1),size(rho_in,2))
 
@@ -109,9 +118,16 @@ function me_solve_H_time_dependent(rho_in::Array{T1,2},
 								   iter_num=1e5,
 								   stop_points::Vector{Float64}=[]) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
 
-	rho_in = convert(Array{ComplexF64,2},rho_in)
-	Gamma = convert(Array{ComplexF64,3},Gamma)
-	rates = convert(Array{Float64,1},rates)
+	# Only convert if the type is wrong
+	if typeof(rho_in) != Array{ComplexF64,2} 
+		rho_in = convert(Array{ComplexF64,2},rho_in)
+	end
+	if typeof(Gamma) != Array{ComplexF64,3} 
+		Gamma = convert(Array{ComplexF64,3},Gamma)
+	end
+	if typeof(rates) != Array{Float64,1} 
+		rates = convert(Array{Float64,1},rates)
+	end
 
 	dRho_L = Array{ComplexF64}(undef,size(rho_in,1),size(rho_in,2))
 	H_temp = Array{ComplexF64}(undef,size(rho_in,1),size(rho_in,2))
@@ -187,10 +203,19 @@ function me_solve_H_time_dependent(rho_in::Array{T1,2},
 								   adapt::Bool = true,
 								   δt::Float64 = tols[1],override::Bool = false) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat, T5 <: Number}
 
-	rho_in = convert(Array{ComplexF64,2},rho_in)
-	Gamma = convert(Array{ComplexF64,3},Gamma)
-	rates = convert(Array{Float64,1},rates)
-	Hops = convert(Array{ComplexF64,3},Hops)
+	# Only convert if the type is wrong
+	if typeof(rho_in) != Array{ComplexF64,2} 
+		rho_in = convert(Array{ComplexF64,2},rho_in)
+	end
+	if typeof(Gamma) != Array{ComplexF64,3} 
+		Gamma = convert(Array{ComplexF64,3},Gamma)
+	end
+	if typeof(rates) != Array{Float64,1} 
+		rates = convert(Array{Float64,1},rates)
+	end
+	if typeof(Hops) != Array{ComplexF64,3}
+		Hops = convert(Array{ComplexF64,3},Hops)
+	end
 
 	dRho_L = Array{ComplexF64}(undef,size(rho_in,1),size(rho_in,2))
 	H_temp = Array{ComplexF64}(undef,size(rho_in,1),size(rho_in,2))
@@ -262,9 +287,16 @@ function me_solve_L_time_dependent(rho_in::Array{T1,2},
 								   alg = Tsit5(),
 								   stop_points::Vector{Float64}=[]) where {T1 <: Number, T2 <: Number, T3 <: Number}
 
-	rho_in = convert(Array{ComplexF64,2},rho_in)
-	H = convert(Array{ComplexF64,2},H)
-	Gamma = convert(Array{ComplexF64,3},Gamma)
+	# Only convert if the type is wrong
+	if typeof(rho_in) != Array{ComplexF64,2} 
+		rho_in = convert(Array{ComplexF64,2},rho_in)
+	end
+	if typeof(Gamma) != Array{ComplexF64,3} 
+		Gamma = convert(Array{ComplexF64,3},Gamma)
+	end
+	if typeof(H) != Array{ComplexF64,2}
+		H = convert(Array{ComplexF64,2},H)
+	end
 
 	dRho_L = Array{ComplexF64}(undef,size(rho_in,1),size(rho_in,2))
 	rates_temp = Array{Float64}(undef,1)
@@ -335,8 +367,13 @@ function me_solve_full_time_dependent(rho_in::Array{T1,2},
 									  alg = Tsit5(),
 									  stop_points::Vector{Float64}=[]) where {T1 <: Number, T2 <: Number, T3 <: Number}
 
-	rho_in = convert(Array{ComplexF64,2},rho_in)
-	Gamma = convert(Array{ComplexF64,3},Gamma)
+	# Only convert if the type is wrong
+	if typeof(rho_in) != Array{ComplexF64,2} 
+		rho_in = convert(Array{ComplexF64,2},rho_in)
+	end
+	if typeof(Gamma) != Array{ComplexF64,3} 
+		Gamma = convert(Array{ComplexF64,3},Gamma)
+	end
 
 	dRho_L = Array{ComplexF64}(undef,size(rho_in,1),size(rho_in,2))
 	rates_temp = Array{Float64}(undef,1)
@@ -400,10 +437,19 @@ function me_solve_time_independent_vec(rho_in::Array{T1,2},
 									   tols::Vector{Float64}=[1e-6,1e-3],
 									   alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
 
-	rho_in = convert(Array{ComplexF64,2},rho_in)
-	H = convert(Array{ComplexF64,2},H)
-	Gamma = convert(Array{ComplexF64,3},Gamma)
-	rates = convert(Array{Float64,1},rates)
+	# Only convert if the type is wrong
+	if typeof(rho_in) != Array{ComplexF64,2} 
+		rho_in = convert(Array{ComplexF64,2},rho_in)
+	end
+	if typeof(Gamma) != Array{ComplexF64,3} 
+		Gamma = convert(Array{ComplexF64,3},Gamma)
+	end
+	if typeof(rates) != Array{Float64,1} 
+		rates = convert(Array{Float64,1},rates)
+	end
+	if typeof(H) != Array{ComplexF64,2}
+		Hops = convert(Array{ComplexF64,2},H)
+	end
 
 	rho_in_vec = rho_in[:]
 
