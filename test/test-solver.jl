@@ -14,6 +14,7 @@ function test_solver_args()
 	t0 = 0.0
 	tf = 1.0
 	tstep = 0.01
+	stop_points = collect(t0:tstep:tf)
 	tols = [1e-7,1e-4]
 	rates = [1.,1.,1.,1.]
 
@@ -29,12 +30,12 @@ function test_solver_args()
 	end
 	rt(t) = exp(-t)*rates
 
-	tvec_t1, rho_out_t1 = MESolve.me_solve_H_time_dependent(rho_in, H_ip, gamma, rates, t0, tf, tstep = tstep, tols = tols)
-	tvec_t2, rho_out_t2 = MESolve.me_solve_H_time_dependent(rho_in, H_ip, gamma, rates, t0, tf, tstep = tstep, tols = tols, alg = DP5())
-	tvec_t3, rho_out_t3 = MESolve.me_solve_L_time_dependent(rho_in, H, gamma, rt, t0, tf, tstep = tstep, tols = tols)
-	tvec_t4, rho_out_t4 = MESolve.me_solve_L_time_dependent(rho_in, H, gamma, rt, t0, tf, tstep = tstep, tols = tols, alg = DP5())
-	tvec_t5, rho_out_t6 = MESolve.me_solve_full_time_dependent(rho_in, Ht, gamma, rt, t0, tf, tstep = tstep, tols = tols)
-	tvec_t6, rho_out_t6 = MESolve.me_solve_full_time_dependent(rho_in, Ht, gamma, rt, t0, tf, tstep = tstep, tols = tols, alg = DP5())
+	tvec_t1, rho_out_t1 = MESolve.me_solve_H_time_dependent(rho_in, H_ip, gamma, rates, t0, tf, tstep = tstep, tols = tols, stop_points = stop_points)
+	tvec_t2, rho_out_t2 = MESolve.me_solve_H_time_dependent(rho_in, H_ip, gamma, rates, t0, tf, tstep = tstep, tols = tols, alg = DP5(), stop_points = stop_points)
+	tvec_t3, rho_out_t3 = MESolve.me_solve_L_time_dependent(rho_in, H, gamma, rt, t0, tf, tstep = tstep, tols = tols, stop_points = stop_points)
+	tvec_t4, rho_out_t4 = MESolve.me_solve_L_time_dependent(rho_in, H, gamma, rt, t0, tf, tstep = tstep, tols = tols, alg = DP5(), stop_points = stop_points)
+	tvec_t5, rho_out_t6 = MESolve.me_solve_full_time_dependent(rho_in, Ht, gamma, rt, t0, tf, tstep = tstep, tols = tols, stop_points = stop_points)
+	tvec_t6, rho_out_t6 = MESolve.me_solve_full_time_dependent(rho_in, Ht, gamma, rt, t0, tf, tstep = tstep, tols = tols, alg = DP5(), stop_points = stop_points)
 
 	tvecs = hcat(tvec1,tvec2,tvec_t1,tvec_t2,tvec_t3,tvec_t4,tvec_t5,tvec_t6)
 

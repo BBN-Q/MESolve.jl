@@ -1,14 +1,19 @@
 """
-Generates the Husimi Q distribution of a quantum state on a rectangular grid in phase space
-Input arguments:
-	rho_in: d x d array, the density matrix of the state
-	xgrid: vector of floats, x range to calculate the Q function at
-	ygrid: vector of floats, y range to calculate the Q function at
-Output:
-    Q: matrix of the calculated Q function
-"""
+    husimi_Q(rho_in::Array{T1,2},xgrid::Array{Float64,1},
+                                      ygrid::Array{Float64,1}) where {T1 <: Number}
 
-function husimi_Q(rho_in::Array{T1,2},xgrid::Array{Float64,1},ygrid::Array{Float64,1}) where {T1 <: Number}
+Generates the Husimi Q distribution of a quantum state on a rectangular grid in phase space
+
+## args
+* rho_in:   d x d array, the density matrix of the state
+* xgrid:    vector of floats, x range to calculate the Q function at
+* ygrid:    vector of floats, y range to calculate the Q function at
+
+## returns
+* Q:        matrix of the calculated Q function
+"""
+function husimi_Q(rho_in::Array{T1,2},xgrid::Array{Float64,1},
+                                      ygrid::Array{Float64,1}) where {T1 <: Number}
 
     dim = Int(maximum([3*maximum(abs.(xgrid))^2,3*maximum(abs.(ygrid))^2,size(rho_in,1)]))
 
@@ -38,16 +43,23 @@ function husimi_Q(rho_in::Array{T1,2},xgrid::Array{Float64,1},ygrid::Array{Float
 end
 
 """
-Calculates the value of the Husimi Q distribution of a quantum state at the specified points
-Input arguments:
-	rho_in: d x d array, the density matrix of the state
-	xgrid: vector of floats, x coordinates to calculate the Q function at
-	ygrid: vector of floats, y coordinates to calculate the Q function at
-Output:
-    Q: vector of the calculated Q function values
-"""
+    husimi_Q_pw(rho_in::Array{T1,2},
+                xgrid::Array{Float64,1},
+                ygrid::Array{Float64,1}) where {T1 <: Number}
 
-function husimi_Q_pw(rho_in::Array{T1,2},xgrid::Array{Float64,1},ygrid::Array{Float64,1}) where {T1 <: Number}
+Calculates the value of the Husimi Q distribution of a quantum state at the specified points
+
+## args
+* rho_in:   d x d array, the density matrix of the state
+* xgrid:    vector of floats, x coordinates to calculate the Q function at
+* ygrid:    vector of floats, y coordinates to calculate the Q function at
+
+## returns
+* Q:        vector of the calculated Q function values
+"""
+function husimi_Q_pw(rho_in::Array{T1,2},
+                     xgrid::Array{Float64,1},
+                     ygrid::Array{Float64,1}) where {T1 <: Number}
 
     size(xgrid,1) == size(ygrid,1) || throw(DimensionMismatch("size of xgrid is not equal to size of ygrid"))
 

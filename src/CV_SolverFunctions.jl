@@ -1,40 +1,55 @@
 # New version
 """
-Time independent solver for N-mode Gaussian continuous variable systems using the covariance matrix approach. Defined in terms of the canonical X and P quadratures for each, the covariance matrix elements are defined by
-	C_ab = <cc^⊺> - <c><c^⊺> where c^⊺ = [X_1,P_1,X_2,P_2,...,X_N,P_N] with
-	X = (a + a^†)/√2, P = -i(a - a^†)/√2
-	where "a" is the lowering operator of a harmonic oscilaltor. Note that c is a column vector and c^⊺ is its transpose, a row vector.
+	CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},
+													 h::Array{T2,2},
+													 d::Array{T3,1},
+													 Z::Array{T4,2},
+													 t0::AbstractFloat,
+													 tf::AbstractFloat; 
+													 tstep::AbstractFloat=0.,
+													 tols::Vector{Float64}=[1e-6,1e-3],
+													 alg = Tsit5()) where {T1 <: Number, T2 <: Number,  T3 <: Number, T4 <: Number}
+
+Time independent solver for N-mode Gaussian continuous variable systems 
+using the covariance matrix approach. Defined in terms of the canonical 
+X and P quadratures for each, the covariance matrix elements are defined by
+C_ab = <cc^⊺> - <c><c^⊺> where c^⊺ = [X_1,P_1,X_2,P_2,...,X_N,P_N] with
+X = (a + a^†)/√2, P = -i(a - a^†)/√2 where "a" is the lowering operator 
+of a harmonic oscilaltor. Note that c is a column vector and c^⊺ is its 
+transpose, a row vector.
 
 The total Hamiltonian is H = H_quad + H_lin = 1/2*(c^⊺*h*c) + d^⊺*c
 
-Input Parameters:
-REQUIRED
-	C_in: Array 2N × 2N, initial condition for the covariance matrix
+## args
+* C_in:  Array 2N × 2N, initial condition for the covariance matrix
+* a_in:  vector 2N × 1, initial condition for the average value vector
+* h:     2N × 2N matrix, describing the quadratic part of the Hamiltonian 
+	 	 evolution of the system in the X_i, P_i basis, such that H_quad = 1/2*(c^⊺*h*c)
+* d:     2N × 1 vector, describing the linear part of the Hamiltonian 
+	     evolution of the system in the X_i, P_i basis, such that H_lin = d^⊺*c
+* Z:     Array 2N × 2N, describes the dissipative evolution of the system. 
+	     Given the master equation d/dt ρ = ∑_k γ_k*D[L_k]ρ with D[L_k]ρ the 
+	     standard dissipator for the Lindblad operator L_k, we describe each 
+	     Lindblad operator in the X_i, P_i basis as L_k = R_k^⊺*c Then
+	     Z = ∑_k γ_k*conj(R_k)*R_k^⊺
+* t0:    float, start time
+* tf:    float, end time
+* tstep: float, time steps at which output data should be saved
+* tols:  2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
+* alg:   function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
 
-	a_in: vector 2N × 1, initial condition for the average value vector
-
-	h: 2N × 2N matrix, describing the quadratic part of the Hamiltonian evolution of the system in the X_i, P_i basis, such that
-		H_quad = 1/2*(c^⊺*h*c)
-
-	d: 2N × 1 vector, describing the linear part of the Hamiltonian evolution of the system in the X_i, P_i basis, such that
-		H_lin = d^⊺*c
-
-	Z: Array 2N × 2N, describes the dissipative evolution of the system. Given the master equation
-	d/dt ρ = ∑_k γ_k*D[L_k]ρ
-	with D[L_k]ρ the standard dissipator for the Lindblad operator L_k, we describe each Lindblad operator in the X_i, P_i basis as
-	L_k = R_k^⊺*c
-	Then
-	Z = ∑_k γ_k*conj(R_k)*R_k^⊺
-
-	t0: float, start time
-
-	tf: float, end time
-KEYWORD OPTIONAL
-	tstep: float, time steps at which output data should be saved
-	tols: 2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
-	alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
+## returns
+* sol_C.t, sol_C.u, sol_a.t, sol_a.u
 """
-function CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},h::Array{T2,2},d::Array{T3,1},Z::Array{T4,2},t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5()) where {T1 <: Number, T2 <: Number,  T3 <: Number, T4 <: Number}
+function CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},
+													 h::Array{T2,2},
+													 d::Array{T3,1},
+													 Z::Array{T4,2},
+													 t0::AbstractFloat,
+													 tf::AbstractFloat; 
+													 tstep::AbstractFloat=0.,
+													 tols::Vector{Float64}=[1e-6,1e-3],
+													 alg = Tsit5()) where {T1 <: Number, T2 <: Number,  T3 <: Number, T4 <: Number}
 
 	C_in = convert(Array{ComplexF64,2}, C_in)
 	h = convert(Array{Float64,2}, h)
@@ -75,9 +90,19 @@ end
 
 
 """
+    CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},
+												   h::Array{T2,2},
+												   d::Function,
+												   Z::Array{T3,2},
+												   t0::AbstractFloat,
+												   tf::AbstractFloat; 
+												   tstep::AbstractFloat=0.,
+												   tols::Vector{Float64}=[1e-6,1e-3],
+												   alg = Tsit5()) where {T1 <: Number, T2 <: Number,  T3 <: Number}
+
 Time dependent (drive only) solver for N-mode Gaussian continuous variable systems using the covariance matrix approach.
 
-Input Parameters:
+args:
 REQUIRED
 	C_in: Array 2N × 2N, initial condition for the covariance matrix
 
@@ -104,7 +129,15 @@ KEYWORD OPTIONAL
 	tols: 2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
 	alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
 """
-function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},h::Array{T2,2},d::Function,Z::Array{T3,2},t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5()) where {T1 <: Number, T2 <: Number,  T3 <: Number}
+function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},
+												   h::Array{T2,2},
+												   d::Function,
+												   Z::Array{T3,2},
+												   t0::AbstractFloat,
+												   tf::AbstractFloat; 
+												   tstep::AbstractFloat=0.,
+												   tols::Vector{Float64}=[1e-6,1e-3],
+												   alg = Tsit5()) where {T1 <: Number, T2 <: Number,  T3 <: Number}
 
 	C_in = convert(Array{ComplexF64,2}, C_in)
 	h = convert(Array{Float64,2}, h)
@@ -128,7 +161,10 @@ function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},h::Arra
 
     prob_C = ODEProblem{true}(dif_C,C_in,tspan)
 
-    sol_C = solve(prob_C, alg, saveat = tstep, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2])
+    sol_C = solve(prob_C, alg, saveat = tstep, dense=false, 
+    										   save_everystep=false, 
+    										   abstol = tols[1], 
+    										   reltol = tols[2])
 
 	# Average
 
@@ -177,7 +213,15 @@ KEYWORD OPTIONAL
 	tols: 2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
 	alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
 """
-function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},h::Function,d::Function,Z::Array{T2,2},t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5()) where {T1 <: Number, T2 <: Number}
+function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},
+												   h::Function,
+												   d::Function,
+												   Z::Array{T2,2},
+												   t0::AbstractFloat,
+												   tf::AbstractFloat; 
+												   tstep::AbstractFloat=0.,
+												   tols::Vector{Float64}=[1e-6,1e-3],
+												   alg = Tsit5()) where {T1 <: Number, T2 <: Number}
 
 	C_in = convert(Array{ComplexF64,2}, C_in)
 	Z = convert(Array{ComplexF64,2}, Z)
@@ -205,7 +249,10 @@ function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},h::Func
 
     prob_C = ODEProblem{true}(dif_C,C_in,tspan)
 
-    sol_C = solve(prob_C, alg, saveat = tstep, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2])
+    sol_C = solve(prob_C, alg, saveat = tstep, dense=false, 
+    										   save_everystep=false, 
+    										   abstol = tols[1], 
+    										   reltol = tols[2])
 
 	# Average
 
@@ -220,7 +267,10 @@ function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},h::Func
 
     prob_a = ODEProblem{true}(dif_a,a_in,tspan)
 
-    sol_a = solve(prob_a, alg, saveat = tstep, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2])
+    sol_a = solve(prob_a, alg, saveat = tstep, dense=false, 
+    										   save_everystep=false, 
+    										   abstol = tols[1], 
+    										   reltol = tols[2])
 
 	return sol_C.t, sol_C.u, sol_a.t, sol_a.u
 end
@@ -262,7 +312,17 @@ KEYWORD OPTIONAL
 	tols: 2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
 	alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
 """
-function CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},ω::Vector{Float64},g::Array{T2,2},λ::Array{T3,2},α::Array{T4,1},Z::Array{T5,2},t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: Number, T5 <: Number}
+function CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},
+													 ω::Vector{Float64},
+													 g::Array{T2,2},
+													 λ::Array{T3,2},
+													 α::Array{T4,1},
+													 Z::Array{T5,2},
+													 t0::AbstractFloat,
+													 tf::AbstractFloat; 
+													 tstep::AbstractFloat=0.,
+													 tols::Vector{Float64}=[1e-6,1e-3],
+													 alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: Number, T5 <: Number}
 
 	# Conert to X,P basis
 	Num = length(ω)
@@ -294,7 +354,9 @@ function CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},ω::V
 
 	d[:] = sqrt(2)*vec([real.(α) -imag.(α)]')[:]
 
-	return CV_solve_time_independent(C_in,a_in,h,d,Z,t0,tf; tstep=tstep,tols=tols,alg=alg)
+	return CV_solve_time_independent(C_in,a_in,h,d,Z,t0,tf; tstep=tstep,
+															tols=tols,
+															alg=alg)
 end
 
 """
@@ -327,7 +389,17 @@ KEYWORD OPTIONAL
 	tols: 2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
 	alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
 """
-function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},ω::Vector{Float64},g::Array{T2,2},λ::Array{T3,2},α::Function,Z::Array{T4,2},t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: Number}
+function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},
+												   ω::Vector{Float64},
+												   g::Array{T2,2},
+												   λ::Array{T3,2},
+												   α::Function,
+												   Z::Array{T4,2},
+												   t0::AbstractFloat,
+												   tf::AbstractFloat; 
+												   tstep::AbstractFloat=0.,
+												   tols::Vector{Float64}=[1e-6,1e-3],
+												   alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: Number}
 
 	# Conert to X,P basis
 	Num = length(ω)

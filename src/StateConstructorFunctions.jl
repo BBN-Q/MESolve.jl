@@ -1,9 +1,13 @@
 """
+    create_HO(dim::Int)
+
 This function creates the operators for a Harmonic oscillator of the specified dimension.
-Input arguments:
-    dim: Hilbert space dimesnion of the oscillator
-Output:
-    (lower, raise, N): tuple of the lowering, raising, and photon number operator for the HO
+
+## args
+* dim: Hilbert space dimesnion of the oscillator
+
+## returns
+(lower, raise, N): tuple of the lowering, raising, and photon number operator for the HO
 """
 function create_HO(dim::Int)
 
@@ -20,13 +24,17 @@ function create_HO(dim::Int)
 end
 
 """
+    create_HO_network(dim::Array{Int},freqs::Vector{Float64},couple::Array{T,2}) where {T <: Number}
+
 This function creates the Hamiltonian for a Harmonic oscillator network.
-Input arguments:
-    dim: array of the Hilbert space dimensions of the oscillators
-    freqs: frequencies of the oscillators
-    couple: matrix of tunnel couplings (beamsplitter interaction) between the HOs. Only the upper triangle is used, and the diagonal should be zero. For row index j and column index k, couple[j,k] is the rate for the operator raise_j ⊗ lower_k
-Output:
-    H: full Hamiltonian of the network
+
+## args
+* dim:      array of the Hilbert space dimensions of the oscillators
+* freqs:    frequencies of the oscillators
+* couple:   matrix of tunnel couplings (beamsplitter interaction) between the HOs. Only the upper triangle is used, and the diagonal should be zero. For row index j and column index k, couple[j,k] is the rate for the operator raise_j ⊗ lower_k
+
+## returns
+* H:        full Hamiltonian of the network
 """
 function create_HO_network(dim::Array{Int},freqs::Vector{Float64},couple::Array{T,2}) where {T <: Number}
 
@@ -64,7 +72,23 @@ end
 
 # To be updated
 # In place version of the above
-function create_HO_network(H::Array{T1,2},dim::Int,freqs::Vector{Float64},couple::Array{T2,2}) where {T1 <: Number, T2 <: Number}
+"""
+    create_HO_network!(H::Array{T1,2},dim::Int,freqs::Vector{Float64},couple::Array{T2,2}) where {T1 <: Number, T2 <: Number}
+
+In place version of `create_HO_network` where the Hamiltonian H is modified
+
+## args
+* H:      full Hamiltonian of the network
+* dim:    array of the Hilbert space dimensions of the oscillators
+* freqs:  frequencies of the oscillators
+* couple: matrix of tunnel couplings (beamsplitter interaction) between the 
+            HOs. Only the upper triangle is used, and the diagonal should be zero. 
+            For row index j and column index k, couple[j,k] is the rate for the 
+            operator raise_j ⊗ lower_k
+## returns
+nothing 
+"""
+function create_HO_network!(H::Array{T1,2},dim::Int,freqs::Vector{Float64},couple::Array{T2,2}) where {T1 <: Number, T2 <: Number}
 
     num = length(freqs)
     (lower, raise, N) = create_HO(dim)
@@ -93,15 +117,29 @@ function create_HO_network(H::Array{T1,2},dim::Int,freqs::Vector{Float64},couple
 end
 
 """
+    create_KPO_network(dim::Array{Int},freqs::Vector{Float64},couple::Array{T1,2},sqz::Array{T2,2},kerr::Array{Float64,2}) where {T1 <: Number, T2 <: Number}
+
 This function creates the Hamiltonian for a Kerr parametric oscillator network.
-Input arguments:
-    dim: array of the Hilbert space dimensions of the oscillators
-    freqs: frequencies of the oscillators
-    couple: matrix of tunnel couplings (beamsplitter interaction) between the HOs. Only the upper triangle is used, and the diagonal should be zero. For row index j and column index k, couple[j,k] is the rate for the operator raise_j ⊗ lower_k
-    sqz: matrix of squeezing interaction rates. Only the upper triangle is used, with the diagonal describing single-mode, and the off-diagonal two-mode squeezing. For row index j and column index k, sqz[j,k] is the rate for the operator raise_j ⊗ raise_k
-    kerr: matrix of the self and cross Kerr interaction rates. Only the upper triangle is used with the diagonal describing self, and the off-diagonal cross Kerr. For row index j and column index k, kerr[j,k] is the rate for the operator N_j ⊗ N_k. Note that this is NOT NORMAL ORDERED for j = k
-Output:
-    H: full Hamiltonian of the network
+
+## args
+* dim:    array of the Hilbert space dimensions of the oscillators
+* freqs:  frequencies of the oscillators
+* couple: matrix of tunnel couplings (beamsplitter interaction) between the 
+            HOs. Only the upper triangle is used, and the diagonal should be zero. 
+            For row index j and column index k, couple[j,k] is the rate for the 
+            operator raise_j ⊗ lower_k
+* sqz:    matrix of squeezing interaction rates. Only the upper triangle is 
+            used, with the diagonal describing single-mode, and the off-diagonal 
+            two-mode squeezing. For row index j and column index k, sqz[j,k] is 
+            the rate for the operator raise_j ⊗ raise_k
+* kerr:   matrix of the self and cross Kerr interaction rates. Only the upper 
+            triangle is used with the diagonal describing self, and the 
+            off-diagonal cross Kerr. For row index j and column index k, kerr[j,k] 
+            is the rate for the operator N_j ⊗ N_k. Note that this is NOT 
+            NORMAL ORDERED for j = k
+
+## returns
+* H:      full Hamiltonian of the network
 """
 function create_KPO_network(dim::Array{Int},freqs::Vector{Float64},couple::Array{T1,2},sqz::Array{T2,2},kerr::Array{Float64,2}) where {T1 <: Number, T2 <: Number}
 
@@ -143,7 +181,34 @@ end
 
 # To be updated
 # In place version of the above
-function create_KPO_network(H::Array{T1,2},dim::Int,freqs::Vector{Float64},couple::Array{T2,2},sqz::Array{T3,2},kerr::Array{Float64,2}) where {T1 <: Number, T2 <: Number, T3 <: Number}
+"""
+    create_KPO_network!(H::Array{T1,2},dim::Int,freqs::Vector{Float64},couple::Array{T2,2},sqz::Array{T3,2},kerr::Array{Float64,2}) where {T1 <: Number, T2 <: Number, T3 <: Number}
+
+In place version of `create_KPO_network` where the Hamiltonian H is update.
+
+This function creates the Hamiltonian for a Kerr parametric oscillator network.
+
+## args
+* dim:    array of the Hilbert space dimensions of the oscillators
+* freqs:  frequencies of the oscillators
+* couple: matrix of tunnel couplings (beamsplitter interaction) between the 
+            HOs. Only the upper triangle is used, and the diagonal should be zero. 
+            For row index j and column index k, couple[j,k] is the rate for the 
+            operator raise_j ⊗ lower_k
+* sqz:    matrix of squeezing interaction rates. Only the upper triangle is 
+            used, with the diagonal describing single-mode, and the off-diagonal 
+            two-mode squeezing. For row index j and column index k, sqz[j,k] is 
+            the rate for the operator raise_j ⊗ raise_k
+* kerr:   matrix of the self and cross Kerr interaction rates. Only the upper 
+            triangle is used with the diagonal describing self, and the 
+            off-diagonal cross Kerr. For row index j and column index k, kerr[j,k] 
+            is the rate for the operator N_j ⊗ N_k. Note that this is NOT 
+            NORMAL ORDERED for j = k
+
+## returns 
+nothing 
+"""
+function create_KPO_network!(H::Array{T1,2},dim::Int,freqs::Vector{Float64},couple::Array{T2,2},sqz::Array{T3,2},kerr::Array{Float64,2}) where {T1 <: Number, T2 <: Number, T3 <: Number}
 
     num = length(freqs)
     (lower, raise, N) = create_HO(dim)
@@ -178,11 +243,17 @@ function create_KPO_network(H::Array{T1,2},dim::Int,freqs::Vector{Float64},coupl
 end
 
 """
-This function creates the operators for a single qubit. Note the convention used that (1,0)^T is the excited state.
-Output:
-    X, Y, Z: Pauli matrices
-    lower: lowering operator
-    raise: raising operator
+    create_Qubit()
+
+This function creates the operators for a single qubit. Note the convention 
+used that (1,0)^T is the excited state.
+
+## returns
+* X, Y, Z:  Pauli matrices
+* lower:    lowering operator
+* raise:    raising operator
+
+as a tuple : (X, Y, Z, lower, raise)
 """
 function create_Qubit()
 
@@ -197,13 +268,22 @@ function create_Qubit()
 end
 
 """
-This function creates the operators for a single qubit. Note the convention used that (1,0)^T is the excited state.
-Input arguments:
-    conv: +1 or -1 indicating the convention that either (1,0)^T or (0,1)^T is the excited state. +1 and -1 imply a qubit self Hamiltonian of +Z or -Z respectively.
-Output:
-    X, Y, Z: Pauli matrices
-    lower: lowering operator
-    raise: raising operator
+    create_Qubit(conv::Int)
+
+This function creates the operators for a single qubit. Note the convention 
+used that (1,0)^T is the excited state.
+
+## args
+* conv:     +1 or -1 indicating the convention that either (1,0)^T or (0,1)^T is 
+                the excited state. +1 and -1 imply a qubit self Hamiltonian of 
+                +Z or -Z respectively.
+
+## returns:
+* X, Y, Z:  Pauli matrices
+* lower:    lowering operator
+* raise:    raising operator
+
+as a tuple : (X, Y, Z, lower, raise)
 """
 function create_Qubit(conv::Int)
 
@@ -218,18 +298,31 @@ function create_Qubit(conv::Int)
 end
 
 """
+    create_qubit_network(freqs::Vector{Float64},couple::Array{T,2};Ctype::String = "flipflop",conv::Int = 1) where {T <: Number}
+
 This function creates a network of qubits with the coupling type specified and returns its Hamiltonian.
 Input arguments:
-REQUIRED
-    freqs: vector of frequencies of the qubits
-    couple: matrix of coupling rates between the qubits. Only the upper triangle is used, and the diagonal should be zero. For row index j and column index k, couple[j,k] is the rate for the operator raise_j ⊗ lower_k for the (default) RWA flipflop interaction
-KEYWORD OPTIONAL
-    type: one of {"XX","YY","ZZ","flipflop"} describing the type of the interaction. The first three possibilites describe Pauli matrix coupling between the qubits. If type = "flipflop" or is unset, then the interaction is the RWA, excitation number conserving flip-flop interaction raise_j ⊗ lower_k + h.c.. Note that the type is consisnent across the qubit network.
-    conv: +1 or -1 indicating the convention that either (1,0)^T or (0,1)^T is the excited state. +1 and -1 imply a qubit self Hamiltonian of +Z or -Z respectively.
-Output:
-    H: full Hamiltonian of the network
+
+## args
+* freqs:    vector of frequencies of the qubits
+* couple:   matrix of coupling rates between the qubits. Only the upper triangle 
+                is used, and the diagonal should be zero. For row index j and 
+                column index k, couple[j,k] is the rate for the operator 
+                raise_j ⊗ lower_k for the (default) RWA flipflop interaction
+* Ctype:    one of {"XX","YY","ZZ","flipflop"} describing the type of the 
+                interaction. The first three possibilites describe Pauli 
+                matrix coupling between the qubits. If type = "flipflop" or is 
+                unset, then the interaction is the RWA, excitation number 
+                conserving flip-flop interaction raise_j ⊗ lower_k + h.c.. 
+                Note that the type is consisnent across the qubit network.
+* conv:     +1 or -1 indicating the convention that either (1,0)^T or (0,1)^T 
+                is the excited state. +1 and -1 imply a qubit self Hamiltonian 
+                of +Z or -Z respectively.
+
+## returns
+* H:        full Hamiltonian of the network
 """
-function create_Qubit_network(freqs::Vector{Float64},couple::Array{T,2};Ctype::String = "flipflop",conv::Int = 1) where {T <: Number}
+function create_qubit_network(freqs::Vector{Float64},couple::Array{T,2};Ctype::String = "flipflop",conv::Int = 1) where {T <: Number}
 
     num = length(freqs)
     X, Y, Z, lower, raise = create_Qubit(conv)
@@ -296,7 +389,33 @@ function create_Qubit_network(freqs::Vector{Float64},couple::Array{T,2};Ctype::S
 end
 
 # In place version of above
-function create_Qubit_network(H::Array{T1,2},freqs::Vector{Float64},couple::Array{T2,2};Ctype::String = "flipflop",conv::Int = 1) where {T1 <: Number, T2 <: Number}
+"""
+    create_qubit_network!(H::Array{T1,2},freqs::Vector{Float64},couple::Array{T2,2};Ctype::String = "flipflop",conv::Int = 1) where {T1 <: Number, T2 <: Number}
+
+In place version of `create_Qubit_network` where the Hamiltonian H is updated.
+
+## args
+* freqs:    vector of frequencies of the qubits
+* couple:   matrix of coupling rates between the qubits. Only the upper 
+                triangle is used, and the diagonal should be zero. For 
+                row index j and column index k, couple[j,k] is the rate 
+                for the operator raise_j ⊗ lower_k for the (default) RWA 
+                flipflop interaction
+* Ctype:    one of {"XX","YY","ZZ","flipflop"} describing the type of the 
+                interaction. The first three possibilites describe Pauli 
+                matrix coupling between the qubits. If type = "flipflop" 
+                or is unset, then the interaction is the RWA, excitation 
+                number conserving flip-flop interaction 
+                raise_j ⊗ lower_k + h.c.. Note that the type is consisnent 
+                across the qubit network.
+* conv:     +1 or -1 indicating the convention that either (1,0)^T or 
+                (0,1)^T is the excited state. +1 and -1 imply a qubit self 
+                Hamiltonian of +Z or -Z respectively.
+
+## returns
+* nothing
+"""
+function create_qubit_network!(H::Array{T1,2},freqs::Vector{Float64},couple::Array{T2,2};Ctype::String = "flipflop",conv::Int = 1) where {T1 <: Number, T2 <: Number}
 
     num = length(freqs)
     X, Y, Z, lower, raise = create_Qubit(conv)

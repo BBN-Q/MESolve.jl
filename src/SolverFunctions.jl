@@ -1,21 +1,42 @@
 """
+	me_solve_time_independent(rho_in::Array{T1,2},
+								   H::Array{T2,2},
+								   Gamma::Array{T3,3},
+								   rates::Array{T4,1},
+								   t0::AbstractFloat,
+								   tf::AbstractFloat; 
+								   tstep::AbstractFloat=0.,
+								   tols::Vector{Float64}=[1e-6,1e-3],
+								   alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
+
 Time independent master equation solver using a non-vectorized algorithm.
-Input arguments:
+
+## ags
 REQUIRED
-	rho_in: d x d array, the density matrix of the initial state
-	H: d x d array, system Hamiltonian
-	Gamma: d x d x K array, all K Lindblad operators
-	rates: K x 1 array, dissipative rate for each Lindblad operator
-	t0: float, start time
-	tf: float, end time
+* rho_in: 	d x d array, the density matrix of the initial state
+* H: 		d x d array, system Hamiltonian
+* Gamma: 	d x d x K array, all K Lindblad operators
+* rates: 	K x 1 array, dissipative rate for each Lindblad operator
+* t0: 		float, start time
+* tf: 		float, end time
 KEYWORD OPTIONAL
-	tstep: float, time steps at which output data should be saved
-	tols: 2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
-	alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
+* tstep: 	float, time steps at which output data should be saved
+* tols: 	2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
+* alg: 		function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
+
+## returns
+* tvec: 	vector of time points where the density matrix has been simulated
+* rho_out: 	vector of simulated density matricies 
 """
-
-
-function me_solve_time_independent(rho_in::Array{T1,2},H::Array{T2,2},Gamma::Array{T3,3},rates::Array{T4,1},t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
+function me_solve_time_independent(rho_in::Array{T1,2},
+								   H::Array{T2,2},
+								   Gamma::Array{T3,3},
+								   rates::Array{T4,1},
+								   t0::AbstractFloat,
+								   tf::AbstractFloat; 
+								   tstep::AbstractFloat=0.,
+								   tols::Vector{Float64}=[1e-6,1e-3],
+								   alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
 
 	rho_in = convert(Array{ComplexF64,2},rho_in)
 	H = convert(Array{ComplexF64,2},H)
@@ -38,26 +59,55 @@ function me_solve_time_independent(rho_in::Array{T1,2},H::Array{T2,2},Gamma::Arr
     tvec = sol.t
     rho_out = sol.u
 
-return tvec, rho_out
+	return tvec, rho_out
 end
 
 """
-Time dependent (Hamiltonian) master equation solver using a non-vectorized algorithm.
-Input arguments:
-REQUIRED
-	rho_in: d x d array, the density matrix of the initial state
-	H: function, system Hamiltonian, takes input of time and returns the Hamiltonian at the given time in matrix form
-	Gamma: d x d x K array, all K Lindblad operators
-	rates: K x 1 array, dissipative rate for each Lindblad operator
-	t0: float, start time
-	tf: float, end time
-KEYWORD OPTIONAL
-	tstep: float, time steps at which output data should be saved
-	tols: 2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
-	alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
-"""
+	me_solve_H_time_dependent(rho_in::Array{T1,2},
+								   H::Function,
+								   Gamma::Array{T3,3},
+								   rates::Array{T4,1},
+								   t0::AbstractFloat,
+								   tf::AbstractFloat; 
+								   tstep::AbstractFloat=0.,
+								   tols::Vector{Float64}=[1e-6,1e-3],
+								   alg = Tsit5(),
+								   iter_num=1e5,
+								   stop_points::Vector{Float64}=[]) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
 
-function me_solve_H_time_dependent(rho_in::Array{T1,2},H::Function,Gamma::Array{T3,3},rates::Array{T4,1},t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5(),iter_num=1e5) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
+Time dependent (Hamiltonian) master equation solver using a non-vectorized algorithm.
+
+## args
+REQUIRED
+* rho_in: 		d x d array, the density matrix of the initial state
+* H: 			function, system Hamiltonian, takes input of time and returns the 
+					Hamiltonian at the given time in matrix form
+* Gamma: 		d x d x K array, all K Lindblad operators
+* rates: 		K x 1 array, dissipative rate for each Lindblad operator
+* t0: 			float, start time
+* tf: 			float, end time
+KEYWORD OPTIONAL
+* tstep: 		float, time steps at which output data should be saved
+* tols: 		2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
+* alg: 			function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
+* iter_num: 	number of iterations for an adpative solver
+* stop_points: 	vector of time-points the solver must step through (for adaptive solvers)
+
+## returns
+* tvec: 		vector of time points where the density matrix has been simulated
+* rho_out: 		vector of simulated density matricies 
+"""
+function me_solve_H_time_dependent(rho_in::Array{T1,2},
+								   H::Function,
+								   Gamma::Array{T3,3},
+								   rates::Array{T4,1},
+								   t0::AbstractFloat,
+								   tf::AbstractFloat; 
+								   tstep::AbstractFloat=0.,
+								   tols::Vector{Float64}=[1e-6,1e-3],
+								   alg = Tsit5(),
+								   iter_num=1e5,
+								   stop_points::Vector{Float64}=[]) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
 
 	rho_in = convert(Array{ComplexF64,2},rho_in)
 	Gamma = convert(Array{ComplexF64,3},Gamma)
@@ -75,32 +125,67 @@ function me_solve_H_time_dependent(rho_in::Array{T1,2},H::Function,Gamma::Array{
         tstep = (tf-t0)./100
     end
 
-    sol = solve(prob, alg, saveat = tstep, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2], maxiters=iter_num)
+    sol = solve(prob, alg, saveat = tstep, tstops = stop_points, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2], maxiters=iter_num)
 
     tvec = sol.t
     rho_out = sol.u
 
-return tvec, rho_out
+	return tvec, rho_out
 end
 
 """
+	me_solve_H_time_dependent(rho_in::Array{T1,2},
+								   Hops::Array{T5,3},
+								   Hfuncs::Function,
+								   Gamma::Array{T3,3},
+								   rates::Array{T4,1},
+								   t0::AbstractFloat,
+								   tf::AbstractFloat; 
+								   tstep::AbstractFloat=0.,
+								   tols::Vector{Float64}=[1e-6,1e-3],
+								   alg = Tsit5(),iter_num=1e5,
+								   stop_points::Vector{Float64}=[],
+								   adapt::Bool = true,
+								   δt::Float64 = tols[1],override::Bool = false) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat, T5 <: Number}
+
 Time dependent (Hamiltonian) master equation solver using a non-vectorized algorithm. Instead of inputing the Hamiltonian as a matrix function, it is input as a basis of matrices, and a function that describes the time evolution of the scalar prefactor of each basis element.
 
 This solver also allows for fixed timestep integration.
 
 Input arguments (different from above):
+## args
 REQUIRED
-Hops: Array of matrices that describe the Hamiltonian. In the most general case is a full basis for operator space.
-Hfuncs: Function that takes as input a Float (the time) and returns a Vector of Floats. Each element of the output vector is the value of the scalar prefactor for the corresponding basis element in the decomposition of the Hamiltonian.
-
+* Hops: 	Array of matrices that describe the Hamiltonian. In the most 
+				general case is a full basis for operator space.
+* Hfuncs: 	Function that takes as input a Float (the time) and returns 
+				a Vector of Floats. Each element of the output vector is 
+				the value of the scalar prefactor for the corresponding 
+				basis element in the decomposition of the Hamiltonian.
 KEYWORD OPTIONAL
-adapt: Boolean. If false, the solver assumes it is using a fixed timestep integration method.
-δt: Timestep for fixed timestep integration method.
-override: Booelan. If true, overrides the error checking that the data save timestep (tstep) is not less than the fixed integration timestep (δt).
+* adapt: 	Boolean. If false, the solver assumes it is using a fixed 
+				timestep integration method.
+* δt: 		Timestep for fixed timestep integration method.
+* override: Booelan. If true, overrides the error checking that the data 
+				save timestep (tstep) is not less than the fixed integration 
+				timestep (δt).
 
+## returns
+* tvec: 		vector of time points where the density matrix has been simulated
+* rho_out: 		vector of simulated density matricies 
 """
-
-function me_solve_H_time_dependent(rho_in::Array{T1,2},Hops::Array{T5,3},Hfuncs::Function,Gamma::Array{T3,3},rates::Array{T4,1},t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5(),iter_num=1e5,adapt::Bool = true,δt::Float64 = tols[1],override::Bool = false) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat, T5 <: Number}
+function me_solve_H_time_dependent(rho_in::Array{T1,2},
+								   Hops::Array{T5,3},
+								   Hfuncs::Function,
+								   Gamma::Array{T3,3},
+								   rates::Array{T4,1},
+								   t0::AbstractFloat,
+								   tf::AbstractFloat; 
+								   tstep::AbstractFloat=0.,
+								   tols::Vector{Float64}=[1e-6,1e-3],
+								   alg = Tsit5(),iter_num=1e5,
+								   stop_points::Vector{Float64}=[],
+								   adapt::Bool = true,
+								   δt::Float64 = tols[1],override::Bool = false) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat, T5 <: Number}
 
 	rho_in = convert(Array{ComplexF64,2},rho_in)
 	Gamma = convert(Array{ComplexF64,3},Gamma)
@@ -121,7 +206,7 @@ function me_solve_H_time_dependent(rho_in::Array{T1,2},Hops::Array{T5,3},Hfuncs:
     end
 
 	if adapt
-		sol = solve(prob, alg, saveat = tstep, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2], maxiters=iter_num)
+		sol = solve(prob, alg, saveat = tstep, tstops = stop_points, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2], maxiters=iter_num)
 	else
 		if tstep < δt && override == false
 			error("You are using a fixed-timestep solver and the save timestep is smaller than solver timestep. This is probably a bad idea. If you insist, set override = true in the input arguments to override this error checking.")
@@ -132,26 +217,50 @@ function me_solve_H_time_dependent(rho_in::Array{T1,2},Hops::Array{T5,3},Hfuncs:
     tvec = sol.t
     rho_out = sol.u
 
-return tvec, rho_out
+	return tvec, rho_out
 end
 
 """
-Time dependent (dissipative rates) master equation solver using a non-vectorized algorithm.
-Input arguments:
-REQUIRED
-	rho_in: d x d array, the density matrix of the initial state
-	H: d x d array, system Hamiltonian
-	Gamma: d x d x K array, all K Lindblad operators
-	rates: K x 1 array, dissipative rate for each Lindblad operator, takes input time and returns a vector of the dissipative rates at the given time
-	t0: float, start time
-	tf: float, end time
-KEYWORD OPTIONAL
-	tstep: float, time steps at which output data should be saved
-	tols: 2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
-	alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
-"""
+	me_solve_L_time_dependent(rho_in::Array{T1,2},
+								   H::Array{T2,2},
+								   Gamma::Array{T3,3},
+								   rates::Function,
+								   t0::AbstractFloat,
+								   tf::AbstractFloat; 
+								   tstep::AbstractFloat=0.,
+								   tols::Vector{Float64}=[1e-6,1e-3],
+								   alg = Tsit5(),
+								   stop_points::Vector{Float64}=[]) where {T1 <: Number, T2 <: Number, T3 <: Number}
 
-function me_solve_L_time_dependent(rho_in::Array{T1,2},H::Array{T2,2},Gamma::Array{T3,3},rates::Function,t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number}
+Time dependent (dissipative rates) master equation solver using a non-vectorized algorithm.
+
+## args
+* rho_in: 		d x d array, the density matrix of the initial state
+* H: 			d x d array, system Hamiltonian
+* Gamma: 		d x d x K array, all K Lindblad operators
+* rates: 		K x 1 array, dissipative rate for each Lindblad operator, takes input time and returns a vector of the dissipative rates at the given time
+* t0: 			float, start time
+* tf: 			float, end time
+KEYWORD OPTIONAL
+* tstep: 		float, time steps at which output data should be saved
+* tols: 		2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
+* alg: 			function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
+* stop_points: 	vector of time-points the solver must step through (for adaptive solvers)
+
+## returns
+* tvec: 		vector of time points where the density matrix has been simulated
+* rho_out: 		vector of simulated density matricies 
+"""
+function me_solve_L_time_dependent(rho_in::Array{T1,2},
+								   H::Array{T2,2},
+								   Gamma::Array{T3,3},
+								   rates::Function,
+								   t0::AbstractFloat,
+								   tf::AbstractFloat; 
+								   tstep::AbstractFloat=0.,
+								   tols::Vector{Float64}=[1e-6,1e-3],
+								   alg = Tsit5(),
+								   stop_points::Vector{Float64}=[]) where {T1 <: Number, T2 <: Number, T3 <: Number}
 
 	rho_in = convert(Array{ComplexF64,2},rho_in)
 	H = convert(Array{ComplexF64,2},H)
@@ -169,31 +278,62 @@ function me_solve_L_time_dependent(rho_in::Array{T1,2},H::Array{T2,2},Gamma::Arr
         tstep = (tf-t0)./100
     end
 
-    sol = solve(prob, alg, saveat = tstep, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2])
+    sol = solve(prob, alg, saveat = tstep, tstops = stop_points, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2])
 
     tvec = sol.t
     rho_out = sol.u
 
-return tvec, rho_out
+	return tvec, rho_out
 end
 
 """
-Time dependent (Hamiltonian and dissipative rates) master equation solver using a non-vectorized algorithm.
-Input arguments:
-REQUIRED
-	rho_in: d x d array, the density matrix of the initial state
-	H: function, system Hamiltonian, takes input of time and returns the Hamiltonian at the given time in matrix form
-	Gamma: d x d x K array, all K Lindblad operators
-	rates: K x 1 array, dissipative rate for each Lindblad operator, takes input time and returns a vector of the dissipative rates at the given time
-	t0: float, start time
-	tf: float, end time
-KEYWORD OPTIONAL
-	tstep: float, time steps at which output data should be saved
-	tols: 2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
-	alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
-"""
+	me_solve_full_time_dependent(rho_in::Array{T1,2},
+									  H::Function,
+									  Gamma::Array{T3,3},
+									  rates::Function,
+									  t0::AbstractFloat,
+									  tf::AbstractFloat; 
+									  tstep::AbstractFloat=0.,
+									  tols::Vector{Float64}=[1e-6,1e-3],
+									  alg = Tsit5(),
+									  stop_points::Vector{Float64}=[]) where {T1 <: Number, T2 <: Number, T3 <: Number}
 
-function me_solve_full_time_dependent(rho_in::Array{T1,2},H::Function,Gamma::Array{T3,3},rates::Function,t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number}
+Time dependent (Hamiltonian and dissipative rates) master equation solver using a non-vectorized algorithm.
+
+## args
+REQUIRED
+* rho_in: 		d x d array, the density matrix of the initial state
+* H: 			function, system Hamiltonian, takes input of time and returns 
+					the Hamiltonian at the given time in matrix form
+* Gamma: 		d x d x K array, all K Lindblad operators
+* rates: 		K x 1 array, dissipative rate for each Lindblad operator, 
+					takes input time and returns a vector of the dissipative 
+					rates at the given time
+* t0: 			float, start time
+* tf: 			float, end time
+KEYWORD OPTIONAL
+* tstep: 		float, time steps at which output data should be saved
+* tols: 		2 x 1 array, vector of solver tolernaces in the 
+					order [abstol, reltol]
+* alg: 			function, algorithm from DifferentialEquations for the solver 
+					to use, default is Tsit5
+* stop_points: 	vector of time-points the solver must step through 
+					(for adaptive solvers)
+
+## returns
+* tvec: 		vector of time points where the density matrix has been simulated
+* rho_out: 		vector of simulated density matricies 
+"""
+function me_solve_full_time_dependent(rho_in::Array{T1,2},
+									  H::Function,
+									  Gamma::Array{T3,3},
+									  rates::Function,
+									  t0::AbstractFloat,
+									  tf::AbstractFloat; 
+									  tstep::AbstractFloat=0.,
+									  tols::Vector{Float64}=[1e-6,1e-3],
+									  alg = Tsit5(),
+									  stop_points::Vector{Float64}=[]) where {T1 <: Number, T2 <: Number, T3 <: Number}
 
 	rho_in = convert(Array{ComplexF64,2},rho_in)
 	Gamma = convert(Array{ComplexF64,3},Gamma)
@@ -210,32 +350,55 @@ function me_solve_full_time_dependent(rho_in::Array{T1,2},H::Function,Gamma::Arr
         tstep = (tf-t0)./100
     end
 
-    sol = solve(prob, alg, saveat = tstep, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2])
+    sol = solve(prob, alg, saveat = tstep, tstops = stop_points, dense=false, save_everystep=false, abstol = tols[1], reltol = tols[2])
 
     tvec = sol.t
     rho_out = sol.u
 
-return tvec, rho_out
+	return tvec, rho_out
 end
 
 """
+	me_solve_time_independent_vec(rho_in::Array{T1,2},
+									   H::Array{T2,2},
+									   Gamma::Array{T3,3},
+									   rates::Array{T4,1},
+									   t0::AbstractFloat,
+									   tf::AbstractFloat; 
+									   tstep::AbstractFloat=0., 
+									   tols::Vector{Float64}=[1e-6,1e-3],
+									   alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
+
 Time independent master equation solver using a non-vectorized algorithm but with vector ODE solvers
-Input arguments:
+
+## args
 REQUIRED
-	rho_in: d x d array, the density matrix of the initial state
-	H: d x d array, system Hamiltonian
-	Gamma: d x d x K array, all K Lindblad operators
-	rates: K x 1 array, dissipative rate for each Lindblad operator
-	t0: float, start time
-	tf: float, end time
+* rho_in: 		d x d array, the density matrix of the initial state
+* H: 			d x d array, system Hamiltonian
+* Gamma: 		d x d x K array, all K Lindblad operators
+* rates: 		K x 1 array, dissipative rate for each Lindblad operator
+* t0: 			float, start time
+* tf: 			float, end time
 KEYWORD OPTIONAL
-	tstep: float, time steps at which output data should be saved
-	tols: 2 x 1 array, vector of solver tolernaces in the order [abstol, reltol]
-	alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
+* tstep: 		float, time steps at which output data should be saved
+* tols: 		2 x 1 array, vector of solver tolernaces in the 
+					order [abstol, reltol]
+* alg: 			function, algorithm from DifferentialEquations for the 
+					solver to use, default is Tsit5
+
+## returns
+* tvec: 		vector of time points where the density matrix has been simulated
+* rho_out: 		vector of simulated density matricies 
 """
-
-
-function me_solve_time_independent_vec(rho_in::Array{T1,2},H::Array{T2,2},Gamma::Array{T3,3},rates::Array{T4,1},t0::AbstractFloat,tf::AbstractFloat; tstep::AbstractFloat=0.,tols::Vector{Float64}=[1e-6,1e-3],alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
+function me_solve_time_independent_vec(rho_in::Array{T1,2},
+									   H::Array{T2,2},
+									   Gamma::Array{T3,3},
+									   rates::Array{T4,1},
+									   t0::AbstractFloat,
+									   tf::AbstractFloat; 
+									   tstep::AbstractFloat=0., 
+									   tols::Vector{Float64}=[1e-6,1e-3],
+									   alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
 
 	rho_in = convert(Array{ComplexF64,2},rho_in)
 	H = convert(Array{ComplexF64,2},H)
@@ -266,7 +429,7 @@ function me_solve_time_independent_vec(rho_in::Array{T1,2},H::Array{T2,2},Gamma:
 		rho_out[jj] = reshape(rho_out_vec[jj][:],size(H))
 	end
 
-return tvec, rho_out
+	return tvec, rho_out
 end
 
 
