@@ -13,15 +13,13 @@
 """
 In place time independent
 """
-function dRho(out::Array{T,2},rho::Array{ComplexF64,2},H::Array{ComplexF64,2},Gamma::Array{ComplexF64,3},rates::Array{Float64,1},dRho_L::Array{ComplexF64,2}) where {T <: Number}
-
-    fill!(dRho_L,0.) #zeros(Complex{Float64},size(rho,1),size(rho,2))
-    for ii = 1:size(Gamma,3)
-        GammaT = Gamma[:,:,ii]'*Gamma[:,:,ii]
-        dRho_L = dRho_L + rates[ii]*(Gamma[:,:,ii]*rho*Gamma[:,:,ii]' - (GammaT*rho + rho*GammaT)./2)
+function dRho(out::Array{T,2},rho::Array{ComplexF64,2},H::Array{ComplexF64,2},Gamma::Array{ComplexF64,3},GammaTrans::Array{ComplexF64,3},GammaT::Array{ComplexF64,3},rates::Array{Float64,1},dRho_L::Array{ComplexF64,2}) where {T <: Number}
+    fill!(dRho_L,0.0im) 
+    dRho_L .+= rates[1].*(Gamma[:,:,1]*rho*GammaTrans[:,:,1] .- (GammaT[:,:,1]*rho .+ rho*GammaT[:,:,1]))
+    for ii = 2:size(Gamma,3)
+        dRho_L .+= rates[ii].*(Gamma[:,:,ii]*rho*GammaTrans[:,:,ii] .- (GammaT[:,:,ii]*rho .+ rho*GammaT[:,:,ii]))
     end
-
-    out[:,:] =  -1im*(H*rho-rho*H) + dRho_L
+    out .= -1.0im.*(H*rho.-rho*H) .+ dRho_L
     nothing
 end
 
