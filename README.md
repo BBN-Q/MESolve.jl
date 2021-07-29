@@ -44,7 +44,7 @@ See source code for more details, including full list of input arguments.
 Apache License v2.0
 
 ## Contributors
-Luke Govia (luke.c.govia@raytheon.com)
+Luke Govia (lcggovia@gmail.com)
 
 ## Acknowledgements
 This effort was partially funded by ARO under contracts W911NF-19-C-0092 and W911NF-14-C-0048.
