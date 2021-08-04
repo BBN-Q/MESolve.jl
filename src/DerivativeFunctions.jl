@@ -8,18 +8,30 @@
 #     end
 #
 #     out = -1im*(H*rho-rho*H) + dRho_L
+#     out = 1im*(rho*H-H*rho) + dRho_L
 # end
 
 """
 In place time independent
 """
-function dRho(out::Array{T,2},rho::Array{ComplexF64,2},H::Array{ComplexF64,2},Gamma::Array{ComplexF64,3},GammaTrans::Array{ComplexF64,3},GammaT::Array{ComplexF64,3},rates::Array{Float64,1},dRho_L::Array{ComplexF64,2}) where {T <: Number}
+function dRho(out::Array{T,2},rho::Array{ComplexF64,2},H::Array{ComplexF64,2},
+        Gammas::Vector{Array{ComplexF64,2}},
+        GammaTranss::Vector{Array{ComplexF64,2}},
+        GammaTs::Vector{Array{ComplexF64,2}},
+        dRho_L::Array{ComplexF64,2},
+        scratchA::Array{ComplexF64, 2},
+        scratchB::Array{ComplexF64, 2}) where {T <: Number}
     fill!(dRho_L,0.0im) 
-    dRho_L .+= rates[1].*(Gamma[:,:,1]*rho*GammaTrans[:,:,1] .- (GammaT[:,:,1]*rho .+ rho*GammaT[:,:,1]))
-    for ii = 2:size(Gamma,3)
-        dRho_L .+= rates[ii].*(Gamma[:,:,ii]*rho*GammaTrans[:,:,ii] .- (GammaT[:,:,ii]*rho .+ rho*GammaT[:,:,ii]))
+    for ii = 1:length(Gammas)
+        mul!(scratchB, GammaTs[ii], rho )
+        mul!(scratchB, rho, GammaTs[ii], 1, 1)
+        mul!(scratchA, rho, GammaTranss[ii] )
+        mul!(scratchB, Gammas[ii], scratchA, 1, -1)
+        dRho_L .+= scratchB
     end
-    out .= -1.0im.*(H*rho.-rho*H) .+ dRho_L
+    mul!(scratchA, H, rho)
+    mul!(scratchA, rho, H, 1, -1)
+    out = 1im*scratchA + dRho_L
     nothing
 end
 
