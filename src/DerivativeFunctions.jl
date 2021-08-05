@@ -14,24 +14,29 @@
 """
 In place time independent
 """
-function dRho(out::Array{T,2},rho::Array{ComplexF64,2},H::Array{ComplexF64,2},
-        Gammas::Vector{Array{ComplexF64,2}},
-        GammaTranss::Vector{Array{ComplexF64,2}},
-        GammaTs::Vector{Array{ComplexF64,2}},
-        dRho_L::Array{ComplexF64,2},
-        scratchA::Array{ComplexF64, 2},
-        scratchB::Array{ComplexF64, 2}) where {T <: Number}
-    fill!(dRho_L,0.0im) 
-    for ii = 1:length(Gammas)
-        mul!(scratchB, GammaTs[ii], rho )
-        mul!(scratchB, rho, GammaTs[ii], 1, 1)
-        mul!(scratchA, rho, GammaTranss[ii] )
-        mul!(scratchB, Gammas[ii], scratchA, 1, -1)
-        dRho_L .+= scratchB
+function dRho(dρ::Array{T,2},
+        ρ::Array{ComplexF64,2},
+        H::Array{ComplexF64,2},
+        γs::Vector{Array{ComplexF64,2}},
+        γTs::Vector{Array{ComplexF64,2}},
+        γSqs::Vector{Array{ComplexF64,2}},
+        dρ_L::Array{ComplexF64,2},
+        A::Array{ComplexF64, 2},
+        B::Array{ComplexF64, 2}) where {T <: Number}
+    
+    fill!(dρ_L,0.0im) 
+
+    # Rates and numerical pre-factors have been absorbed into γ terms
+    for ii = 1:length(γs)
+        mul!(B, γSqs[ii], ρ )            # B = γSq ρ
+        mul!(B, ρ, γSqs[ii], 1, 1)       # B = ρ γSq + γSq ρ
+        mul!(A, ρ, γTs[ii])              # A = ρ γ'
+        mul!(B, γs[ii], A, 1, -1)        # B = γ (ρ γ') - (ρ γSq + γSq ρ)
+        dρ_L .+= B                       
     end
-    mul!(scratchA, H, rho)
-    mul!(scratchA, rho, H, 1, -1)
-    out = 1im*scratchA + dRho_L
+    mul!(A, H, ρ)                        # A = H ρ
+    mul!(A, ρ, H, 1, -1)                 # A = ρ H - H ρ
+    dρ .= 1.0im*A .+ dρ_L                # dρ = -i( H ρ - ρ H ) + dρ_L
     nothing
 end
 

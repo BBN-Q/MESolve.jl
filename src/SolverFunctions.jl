@@ -38,21 +38,20 @@ function me_solve_time_independent(rho_in::Array{T1,2},
 								   tols::Vector{Float64}=[1e-6,1e-3],
 								   alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
 
-	rho_in = convert(Array{ComplexF64,2},rho_in)
-	H = convert(Array{ComplexF64,2},H)
-	Gamma = convert(Array{ComplexF64,3},Gamma)
-	Gamma_T = similar(Gamma)
-	Gamma_Trans = similar(Gamma)
-	rates = convert(Array{Float64,1},rates)
-	dRho_L = Array{ComplexF64}(undef,size(rho_in,1),size(rho_in,2))
+	rho_in       = convert(Array{ComplexF64,2},rho_in)
+	H            = convert(Array{ComplexF64,2},H)
+	Gamma        = convert(Array{ComplexF64,3},Gamma)
+	rates        = convert(Array{Float64,1},rates)
+	dRho_L       = Array{ComplexF64}(undef,size(rho_in,1),size(rho_in,2))
 
-	# Prefill for lighter solver function
-	for ii = 1:size(Gamma,3)
-	    Gamma_Trans[:,:,ii] = Gamma[:,:,ii]'
-	    Gamma_T[:,:,ii] = Gamma[:,:,ii]'*Gamma[:,:,ii]./2.0
-	end
-					  # dRho2(du,u,H,Gamma,Gamma_Trans,Gamma_T,rates,dRho_L)
-    dif_f(du,u,p,t) = dRho(du,u,H,Gamma,Gamma_Trans,Gamma_T,rates,dRho_L) # In place
+	scratchA     = similar(rho_in);
+	scratchB     = similar(rho_in);
+
+	Gammas       = [Gamma[:,:,ii].*sqrt(rates[ii]) for ii=1:size(Gamma,3)]
+	GammaTs      = [collect(G') for G in Gammas]
+	GammaSqs     = [0.5.*G'G for G in Gammas]
+
+    dif_f(du,u,p,t) = dRho(du,u,H,Gammas,GammaTs,GammaSqs,dRho_L,scratchA,scratchB) # In place
     tspan = (t0,tf)
 
     prob = ODEProblem{true}(dif_f,rho_in,tspan)
