@@ -80,7 +80,7 @@ end
                                    tols::Vector{Float64}=[1e-6,1e-3],
                                    alg = Tsit5(),
                                    iter_num=1e5,
-                                   stop_points::Vector{Float64}=[]
+                                   stop_points=[]
                                    adapt::Bool = true,
                                    δt::Float64 = tols[1],
                                    override::Bool = false) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
@@ -123,7 +123,7 @@ function me_solve_H_time_dependent(rho_in::Array{T1,2},
                                    tols::Vector{Float64}=[1e-6,1e-3],
                                    alg = Tsit5(),
                                    iter_num=1e5,
-                                   stop_points::Vector{Float64}=[],
+                                   stop_points=[],
                                    adapt::Bool = true,
                                    δt::Float64 = tols[1],
                                    override::Bool = false) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat}
@@ -177,7 +177,7 @@ end
                                    tstep::AbstractFloat=0.,
                                    tols::Vector{Float64}=[1e-6,1e-3],
                                    alg = Tsit5(),iter_num=1e5,
-                                   stop_points::Vector{Float64}=[],
+                                   stop_points=[],
                                    adapt::Bool = true,
                                    δt::Float64 = tols[1],
                                    override::Bool = false) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat, T5 <: Number}
@@ -211,7 +211,7 @@ function me_solve_H_time_dependent(rho_in::Array{T1,2},
                                    tols::Vector{Float64}=[1e-6,1e-3],
                                    alg = Tsit5(),
                                    iter_num=1e5,
-                                   stop_points::Vector{Float64}=[],
+                                   stop_points=[],
                                    adapt::Bool = true,
                                    δt::Float64 = tols[1],
                                    override::Bool = false) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: AbstractFloat, T5 <: Number}
@@ -267,7 +267,10 @@ end
                                    tols::Vector{Float64}=[1e-6,1e-3],
                                    alg = Tsit5(),
                                    iter_num=1e5,
-                                   stop_points::Vector{Float64}=[]) where {T1 <: Number, T2 <: Number, T3 <: Number}
+                                   stop_points=[],
+                                   adapt::Bool = true,
+                                   δt::Float64 = tols[1],
+                                   override::Bool = false) where {T1 <: Number, T2 <: Number, T3 <: Number}
 
 Time dependent (dissipative rates) master equation solver using a non-vectorized algorithm.
 
@@ -305,7 +308,7 @@ function me_solve_L_time_dependent(rho_in::Array{T1,2},
                                    tols::Vector{Float64}=[1e-6,1e-3],
                                    alg = Tsit5(),
                                    iter_num=1e5,
-                                   stop_points::Vector{Float64}=[],
+                                   stop_points=[],
                                    adapt::Bool = true,
                                    δt::Float64 = tols[1],
                                    override::Bool = false) where {T1 <: Number, T2 <: Number, T3 <: Number}
@@ -358,7 +361,10 @@ end
                                       tstep::AbstractFloat=0.,
                                       tols::Vector{Float64}=[1e-6,1e-3],
                                       alg = Tsit5(),
-                                      stop_points::Vector{Float64}=[]) where {T1 <: Number, T2 <: Number, T3 <: Number}
+                                      stop_points=[],
+                                      adapt::Bool = true,
+                                      δt::Float64 = tols[1],
+                                      override::Bool = false) where {T1 <: Number, T2 <: Number, T3 <: Number}
 
 Time dependent (Hamiltonian and dissipative rates) master equation solver using a non-vectorized algorithm.
 
@@ -403,7 +409,7 @@ function me_solve_full_time_dependent(rho_in::Array{T1,2},
                                       tols::Vector{Float64}=[1e-6,1e-3],
                                       alg = Tsit5(),
                                       iter_num=1e5,
-                                      stop_points::Vector{Float64}=[],
+                                      stop_points=[],
                                       adapt::Bool = true,
                                       δt::Float64 = tols[1],
                                       override::Bool = false) where {T1 <: Number, T2 <: Number, T3 <: Number}
