@@ -34,8 +34,8 @@ function test_solver_args()
 	tvec_t2, rho_out_t2 = MESolve.me_solve_H_time_dependent(rho_in, H_ip, gamma, rates, t0, tf, tstep = tstep, tols = tols, alg = DP5(), stop_points = stop_points)
 	tvec_t3, rho_out_t3 = MESolve.me_solve_L_time_dependent(rho_in, H, gamma, rt, t0, tf, tstep = tstep, tols = tols, stop_points = stop_points)
 	tvec_t4, rho_out_t4 = MESolve.me_solve_L_time_dependent(rho_in, H, gamma, rt, t0, tf, tstep = tstep, tols = tols, alg = DP5(), stop_points = stop_points)
-	tvec_t5, rho_out_t6 = MESolve.me_solve_full_time_dependent(rho_in, Ht, gamma, rt, t0, tf, tstep = tstep, tols = tols, stop_points = stop_points)
-	tvec_t6, rho_out_t6 = MESolve.me_solve_full_time_dependent(rho_in, Ht, gamma, rt, t0, tf, tstep = tstep, tols = tols, alg = DP5(), stop_points = stop_points)
+	tvec_t5, rho_out_t6 = MESolve.me_solve_full_time_dependent(rho_in, H_ip, gamma, rt, t0, tf, tstep = tstep, tols = tols, stop_points = stop_points)
+	tvec_t6, rho_out_t6 = MESolve.me_solve_full_time_dependent(rho_in, H_ip, gamma, rt, t0, tf, tstep = tstep, tols = tols, alg = DP5(), stop_points = stop_points)
 
 	tvecs = hcat(tvec1,tvec2,tvec_t1,tvec_t2,tvec_t3,tvec_t4,tvec_t5,tvec_t6)
 
