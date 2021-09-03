@@ -11,7 +11,7 @@
 
 Time independent master equation solver using a non-vectorized algorithm.
 
-## ags
+## args
 REQUIRED
 * rho_in:   d x d array, the density matrix of the initial state
 * H:        d x d array, system Hamiltonian
@@ -196,9 +196,17 @@ REQUIRED
                 the value of the scalar prefactor for the corresponding
                 basis element in the decomposition of the Hamiltonian.
 
+KEYWORD OPTIONAL
+* adapt:    Boolean. If false, the solver assumes it is using a fixed 
+                timestep integration method.
+* δt:       Timestep for fixed timestep integration method.
+* override: Booelan. If true, overrides the error checking that the data 
+                save timestep (tstep) is not less than the fixed integration 
+                timestep (δt).
+
 ## returns
 * tvec:         vector of time points where the density matrix has been simulated
-* rho_out:      vector of simulated density matricies
+* rho_out:      vector of simulated density matricies 
 """
 function me_solve_H_time_dependent(rho_in::Array{T1,2},
                                    Hops::Array{T5,3},
@@ -220,7 +228,6 @@ function me_solve_H_time_dependent(rho_in::Array{T1,2},
     Gamma = convert(Array{ComplexF64,3},Gamma)
     rates = convert(Array{Float64,1},rates)
     Hops = convert(Array{ComplexF64,3},Hops)
-
     dRho_L = Array{ComplexF64}(undef,size(rho_in,1),size(rho_in,2))
     H_temp = Array{ComplexF64}(undef,size(rho_in,1),size(rho_in,2))
     Hf_temp = zeros(ComplexF64,size(Hops,3))
@@ -365,7 +372,6 @@ end
                                       adapt::Bool = true,
                                       δt::Float64 = tols[1],
                                       override::Bool = false) where {T1 <: Number, T2 <: Number, T3 <: Number}
-
 Time dependent (Hamiltonian and dissipative rates) master equation solver using a non-vectorized algorithm.
 
 ## args

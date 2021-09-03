@@ -31,10 +31,10 @@ function husimi_Q(rho_in::Array{T1,2},xgrid::Array{Float64,1},
 
     for ii = 1:1:size(xgrid,1)
         for jj = 1:1:size(ygrid,1)
-            temp_a = xgrid[ii]+1im*ygrid[jj]
+            @inbounds temp_a = xgrid[ii]+1im*ygrid[jj]
             Disp = exp(temp_a*raise - conj(temp_a)*lower)
             temp_v = Disp*state
-            Q[ii,jj] = real(temp_v'*rho_temp*temp_v./pi)[1]
+            @inbounds Q[ii,jj] = real(temp_v'*rho_temp*temp_v./pi)[1]
             #Q[ii:ii,jj:jj] = real(temp_v'*rho_temp*temp_v./pi) also works
         end
     end
@@ -78,10 +78,10 @@ function husimi_Q_pw(rho_in::Array{T1,2},
     state[1] = 1
 
     for ii = 1:1:size(xgrid,1)
-        temp_a = xgrid[ii]+1im*ygrid[ii]
+        @inbounds temp_a = xgrid[ii]+1im*ygrid[ii]
         Disp = exp(temp_a*raise - conj(temp_a)*lower)
         temp_v = Disp*state
-        Q[ii] = real(temp_v'*rho_temp*temp_v./pi)[1]
+        @inbounds Q[ii] = real(temp_v'*rho_temp*temp_v./pi)[1]
     end
 
     return Q
