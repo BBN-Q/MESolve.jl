@@ -1,21 +1,21 @@
 # New version
 """
-    CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},
-                                                     h::Array{T2,2},
-                                                     d::Array{T3,1},
-                                                     Z::Array{T4,2},
-                                                     t0::AbstractFloat,
-                                                     tf::AbstractFloat; 
-                                                     tstep::AbstractFloat=0.,
-                                                     tols::Vector{Float64}=[1e-6,1e-3],
-                                                     alg = Tsit5()) where {T1 <: Number, T2 <: Number,  T3 <: Number, T4 <: Number}
+	CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},
+													 h::Array{T2,2},
+													 d::Array{T3,1},
+													 Z::Array{T4,2},
+													 t0::AbstractFloat,
+													 tf::AbstractFloat;
+													 tstep::AbstractFloat=0.,
+													 tols::Vector{Float64}=[1e-6,1e-3],
+													 alg = Tsit5()) where {T1 <: Number, T2 <: Number,  T3 <: Number, T4 <: Number}
 
-Time independent solver for N-mode Gaussian continuous variable systems 
-using the covariance matrix approach. Defined in terms of the canonical 
+Time independent solver for N-mode Gaussian continuous variable systems
+using the covariance matrix approach. Defined in terms of the canonical
 X and P quadratures for each, the covariance matrix elements are defined by
 C_ab = <cc^⊺> - <c><c^⊺> where c^⊺ = [X_1,P_1,X_2,P_2,...,X_N,P_N] with
-X = (a + a^†)/√2, P = -i(a - a^†)/√2 where "a" is the lowering operator 
-of a harmonic oscilaltor. Note that c is a column vector and c^⊺ is its 
+X = (a + a^†)/√2, P = -i(a - a^†)/√2 where "a" is the lowering operator
+of a harmonic oscilaltor. Note that c is a column vector and c^⊺ is its
 transpose, a row vector.
 
 The total Hamiltonian is H = H_quad + H_lin = 1/2*(c^⊺*h*c) + d^⊺*c
@@ -23,6 +23,7 @@ The total Hamiltonian is H = H_quad + H_lin = 1/2*(c^⊺*h*c) + d^⊺*c
 ## args
 * C_in:  Array 2N × 2N, initial condition for the covariance matrix
 * a_in:  vector 2N × 1, initial condition for the average value vector
+
 * h:     2N × 2N matrix, describing the quadratic part of the Hamiltonian 
          evolution of the system in the X_i, P_i basis, such that H_quad = 1/2*(c^⊺*h*c)
 * d:     2N × 1 vector, describing the linear part of the Hamiltonian 
@@ -32,6 +33,7 @@ The total Hamiltonian is H = H_quad + H_lin = 1/2*(c^⊺*h*c) + d^⊺*c
          standard dissipator for the Lindblad operator L_k, we describe each 
          Lindblad operator in the X_i, P_i basis as L_k = R_k^⊺*c Then
          Z = ∑_k γ_k*conj(R_k)*R_k^⊺
+
 * t0:    float, start time
 * tf:    float, end time
 * tstep: float, time steps at which output data should be saved
@@ -42,21 +44,21 @@ The total Hamiltonian is H = H_quad + H_lin = 1/2*(c^⊺*h*c) + d^⊺*c
 * sol_C.t, sol_C.u, sol_a.t, sol_a.u
 """
 function CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},
-                                                     h::Array{T2,2},
-                                                     d::Array{T3,1},
-                                                     Z::Array{T4,2},
-                                                     t0::AbstractFloat,
-                                                     tf::AbstractFloat; 
-                                                     tstep::AbstractFloat=0.,
-                                                     tols::Vector{Float64}=[1e-6,1e-3],
-                                                     alg = Tsit5()) where {T1 <: Number, T2 <: Number,  T3 <: Number, T4 <: Number}
+													 h::Array{T2,2},
+													 d::Array{T3,1},
+													 Z::Array{T4,2},
+													 t0::AbstractFloat,
+													 tf::AbstractFloat;
+													 tstep::AbstractFloat=0.,
+													 tols::Vector{Float64}=[1e-6,1e-3],
+													 alg = Tsit5()) where {T1 <: Number, T2 <: Number,  T3 <: Number, T4 <: Number}
 
-    C_in = convert(Array{ComplexF64,2}, C_in)
-    h = convert(Array{Float64,2}, h)
-    d = convert(Array{Float64,1}, d)
-    Z = convert(Array{ComplexF64,2}, Z)
+	C_in = convert(Array{ComplexF64,2}, C_in)
+	h = convert(Array{Float64,2}, h)
+	d = convert(Array{Float64,1}, d)
+	Z = convert(Array{ComplexF64,2}, Z)
 
-    if tstep < 1e-10
+	if tstep < 1e-10
         tstep = (tf-t0)./100
     end
     tspan = (t0,tf)
@@ -70,7 +72,7 @@ function CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},
     M = σ*(h + imag.(Z))
     Zs = σ*Z*transpose(σ)
 
-    dif_C(du,u,p,t) = dCV(du,u,M,Zs,t) # In place
+    dif_C(du,u,p,t) = dCV!(du,u,M,Zs,t) # In place
 
     prob_C = ODEProblem{true}(dif_C,C_in,tspan)
 
@@ -79,7 +81,7 @@ function CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},
     # Average
     d = σ*d
 
-    dif_a(du,u,p,t) = d_av(du,u,M,d,t) # In place
+	dif_a(du,u,p,t) = d_av!(du,u,M,d,t) # In place
 
     prob_a = ODEProblem{true}(dif_a,a_in,tspan)
 
@@ -91,14 +93,14 @@ end
 
 """
     CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},
-                                                   h::Array{T2,2},
-                                                   d::Function,
-                                                   Z::Array{T3,2},
-                                                   t0::AbstractFloat,
-                                                   tf::AbstractFloat; 
-                                                   tstep::AbstractFloat=0.,
-                                                   tols::Vector{Float64}=[1e-6,1e-3],
-                                                   alg = Tsit5()) where {T1 <: Number, T2 <: Number,  T3 <: Number}
+												   h::Array{T2,2},
+												   d::Function,
+												   Z::Array{T3,2},
+												   t0::AbstractFloat,
+												   tf::AbstractFloat;
+												   tstep::AbstractFloat=0.,
+												   tols::Vector{Float64}=[1e-6,1e-3],
+												   alg = Tsit5()) where {T1 <: Number, T2 <: Number,  T3 <: Number}
 
 Time dependent (drive only) solver for N-mode Gaussian continuous variable systems using the covariance matrix approach.
 
@@ -130,20 +132,20 @@ KEYWORD OPTIONAL
     alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
 """
 function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},
-                                                   h::Array{T2,2},
-                                                   d::Function,
-                                                   Z::Array{T3,2},
-                                                   t0::AbstractFloat,
-                                                   tf::AbstractFloat; 
-                                                   tstep::AbstractFloat=0.,
-                                                   tols::Vector{Float64}=[1e-6,1e-3],
-                                                   alg = Tsit5()) where {T1 <: Number, T2 <: Number,  T3 <: Number}
+												   h::Array{T2,2},
+												   d::Function,
+												   Z::Array{T3,2},
+												   t0::AbstractFloat,
+												   tf::AbstractFloat;
+												   tstep::AbstractFloat=0.,
+												   tols::Vector{Float64}=[1e-6,1e-3],
+												   alg = Tsit5()) where {T1 <: Number, T2 <: Number,  T3 <: Number}
 
-    C_in = convert(Array{ComplexF64,2}, C_in)
-    h = convert(Array{Float64,2}, h)
-    Z = convert(Array{ComplexF64,2}, Z)
+	C_in = convert(Array{ComplexF64,2}, C_in)
+	h = convert(Array{Float64,2}, h)
+	Z = convert(Array{ComplexF64,2}, Z)
 
-    if tstep < 1e-10
+	if tstep < 1e-10
         tstep = (tf-t0)./100
     end
     tspan = (t0,tf)
@@ -157,14 +159,14 @@ function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},
     M = σ*(h + imag.(Z))
     Zs = σ*Z*transpose(σ)
 
-    dif_C(du,u,p,t) = dCV(du,u,M,Zs,t) # In place
+    dif_C(du,u,p,t) = dCV!(du,u,M,Zs,t) # In place
 
     prob_C = ODEProblem{true}(dif_C,C_in,tspan)
 
-    sol_C = solve(prob_C, alg, saveat = tstep, dense=false, 
-                                               save_everystep=false, 
-                                               abstol = tols[1], 
-                                               reltol = tols[2])
+    sol_C = solve(prob_C, alg, saveat = tstep, dense=false,
+    										   save_everystep=false,
+    										   abstol = tols[1],
+    										   reltol = tols[2])
 
     # Average
 
@@ -173,8 +175,8 @@ function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},
         nothing
     end
 
-    drv_temp = Array{Float64}(undef,size(a_in,1))
-    dif_a(du,u,p,t) = d_av(du,u,M,drv,t,drv_temp) # In place
+	drv_temp = Array{Float64}(undef,size(a_in,1))
+	dif_a(du,u,p,t) = d_av!(du,u,M,drv,t,drv_temp) # In place
 
     prob_a = ODEProblem{true}(dif_a,a_in,tspan)
 
@@ -214,19 +216,19 @@ KEYWORD OPTIONAL
     alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
 """
 function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},
-                                                   h::Function,
-                                                   d::Function,
-                                                   Z::Array{T2,2},
-                                                   t0::AbstractFloat,
-                                                   tf::AbstractFloat; 
-                                                   tstep::AbstractFloat=0.,
-                                                   tols::Vector{Float64}=[1e-6,1e-3],
-                                                   alg = Tsit5()) where {T1 <: Number, T2 <: Number}
+												   h::Function,
+												   d::Function,
+												   Z::Array{T2,2},
+												   t0::AbstractFloat,
+												   tf::AbstractFloat;
+												   tstep::AbstractFloat=0.,
+												   tols::Vector{Float64}=[1e-6,1e-3],
+												   alg = Tsit5()) where {T1 <: Number, T2 <: Number}
 
-    C_in = convert(Array{ComplexF64,2}, C_in)
-    Z = convert(Array{ComplexF64,2}, Z)
+	C_in = convert(Array{ComplexF64,2}, C_in)
+	Z = convert(Array{ComplexF64,2}, Z)
 
-    if tstep < 1e-10
+	if tstep < 1e-10
         tstep = (tf-t0)./100
     end
     tspan = (t0,tf)
@@ -244,15 +246,15 @@ function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},
 
     Zs = σ*Z*transpose(σ)
 
-    M_temp = Array{Float64}(undef,size(C_in,1),size(C_in,2))
-    dif_C(du,u,p,t) = dCV(du,u,M,Zs,t,M_temp) # In place
+	M_temp = Array{Float64}(undef,size(C_in,1),size(C_in,2))
+    dif_C(du,u,p,t) = dCV!(du,u,M,Zs,t,M_temp) # In place
 
     prob_C = ODEProblem{true}(dif_C,C_in,tspan)
 
-    sol_C = solve(prob_C, alg, saveat = tstep, dense=false, 
-                                               save_everystep=false, 
-                                               abstol = tols[1], 
-                                               reltol = tols[2])
+    sol_C = solve(prob_C, alg, saveat = tstep, dense=false,
+    										   save_everystep=false,
+    										   abstol = tols[1],
+    										   reltol = tols[2])
 
     # Average
 
@@ -261,17 +263,16 @@ function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},
         nothing
     end
 
-    fill!(M_temp,0.)
-    drv_temp = Array{Float64}(undef,size(a_in,1))
-    dif_a(du,u,p,t) = d_av(du,u,M,drv,t,M_temp,drv_temp) # In place
+	fill!(M_temp,0.)
+	drv_temp = Array{Float64}(undef,size(a_in,1))
+	dif_a(du,u,p,t) = d_av!(du,u,M,drv,t,M_temp,drv_temp) # In place
 
     prob_a = ODEProblem{true}(dif_a,a_in,tspan)
 
-    sol_a = solve(prob_a, alg, saveat = tstep, dense=false, 
-                                               save_everystep=false, 
-                                               abstol = tols[1], 
-                                               reltol = tols[2])
-
+    sol_a = solve(prob_a, alg, saveat = tstep, dense=false,
+    										   save_everystep=false,
+    										   abstol = tols[1],
+    										   reltol = tols[2])
     return sol_C.t, sol_C.u, sol_a.t, sol_a.u
 end
 
@@ -313,50 +314,50 @@ KEYWORD OPTIONAL
     alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
 """
 function CV_solve_time_independent(C_in::Array{T1,2},a_in::Vector{Float64},
-                                                     ω::Vector{Float64},
-                                                     g::Array{T2,2},
-                                                     λ::Array{T3,2},
-                                                     α::Array{T4,1},
-                                                     Z::Array{T5,2},
-                                                     t0::AbstractFloat,
-                                                     tf::AbstractFloat; 
-                                                     tstep::AbstractFloat=0.,
-                                                     tols::Vector{Float64}=[1e-6,1e-3],
-                                                     alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: Number, T5 <: Number}
+													 ω::Vector{Float64},
+													 g::Array{T2,2},
+													 λ::Array{T3,2},
+													 α::Array{T4,1},
+													 Z::Array{T5,2},
+													 t0::AbstractFloat,
+													 tf::AbstractFloat;
+													 tstep::AbstractFloat=0.,
+													 tols::Vector{Float64}=[1e-6,1e-3],
+													 alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: Number, T5 <: Number}
 
-    # Conert to X,P basis
-    Num = length(ω)
-    h = zeros(Float64,size(C_in,1),size(C_in,2))
-    d = zeros(Float64,size(C_in,1))
+	# Conert to X,P basis
+	Num = length(ω)
+	h = zeros(Float64,size(C_in,1),size(C_in,2))
+	d = zeros(Float64,size(C_in,1))
 
-    for jj = 1:1:Num
-        for kk = (jj+1):1:Num
-            # XX
-            h[2*kk-1,2*jj-1] = (real(g[kk,jj]) + real(λ[kk,jj]))
+	for jj = 1:1:Num
+		for kk = (jj+1):1:Num
+			# XX
+			h[2*kk-1,2*jj-1] = (real(g[kk,jj]) + real(λ[kk,jj]))
 
-            #XY
-            h[2*kk-1,2*jj] = (imag(λ[kk,jj]) - imag(g[kk,jj]))
+			#XY
+			h[2*kk-1,2*jj] = (imag(λ[kk,jj]) - imag(g[kk,jj]))
 
-            #YX
-            h[2*kk,2*jj-1] = (imag(λ[kk,jj]) + imag(g[kk,jj]))
+			#YX
+			h[2*kk,2*jj-1] = (imag(λ[kk,jj]) + imag(g[kk,jj]))
 
-            #YY
-            h[2*kk,2*jj] = (real(g[kk,jj]) - real(λ[kk,jj]))
-        end
+			#YY
+			h[2*kk,2*jj] = (real(g[kk,jj]) - real(λ[kk,jj]))
+		end
 
-        #YX same
-        h[2*jj,2*jj-1] = 2*imag(λ[jj,jj])
-    end
+		#YX same
+		h[2*jj,2*jj-1] = 2*imag(λ[jj,jj])
+	end
 
-    h[:,:] = h[:,:] + h[:,:]'
+	h[:,:] = h[:,:] + h[:,:]'
 
-    h[diagind(h)] = vec([(ω+2*real(diag(λ))) (ω-2*real(diag(λ)))]')[:]
+	h[diagind(h)] = vec([(ω+2*real(diag(λ))) (ω-2*real(diag(λ)))]')[:]
 
-    d[:] = sqrt(2)*vec([real.(α) -imag.(α)]')[:]
+	d[:] = sqrt(2)*vec([real.(α) -imag.(α)]')[:]
 
-    return CV_solve_time_independent(C_in,a_in,h,d,Z,t0,tf; tstep=tstep,
-                                                            tols=tols,
-                                                            alg=alg)
+	return CV_solve_time_independent(C_in,a_in,h,d,Z,t0,tf; tstep=tstep,
+															tols=tols,
+															alg=alg)
 end
 
 """
@@ -390,39 +391,39 @@ KEYWORD OPTIONAL
     alg: function, algorithm from DifferentialEquations for the solver to use, default is Tsit5
 """
 function CV_solve_time_dependent(C_in::Array{T1,2},a_in::Vector{Float64},
-                                                   ω::Vector{Float64},
-                                                   g::Array{T2,2},
-                                                   λ::Array{T3,2},
-                                                   α::Function,
-                                                   Z::Array{T4,2},
-                                                   t0::AbstractFloat,
-                                                   tf::AbstractFloat; 
-                                                   tstep::AbstractFloat=0.,
-                                                   tols::Vector{Float64}=[1e-6,1e-3],
-                                                   alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: Number}
+												   ω::Vector{Float64},
+												   g::Array{T2,2},
+												   λ::Array{T3,2},
+												   α::Function,
+												   Z::Array{T4,2},
+												   t0::AbstractFloat,
+												   tf::AbstractFloat;
+												   tstep::AbstractFloat=0.,
+												   tols::Vector{Float64}=[1e-6,1e-3],
+												   alg = Tsit5()) where {T1 <: Number, T2 <: Number, T3 <: Number, T4 <: Number}
 
-    # Conert to X,P basis
-    Num = length(ω)
-    h = zeros(Float64,size(C_in,1),size(C_in,2))
+	# Conert to X,P basis
+	Num = length(ω)
+	h = zeros(Float64,size(C_in,1),size(C_in,2))
 
-    for jj = 1:1:Num
-        for kk = (jj+1):1:Num
-            # XX
-            h[2*kk-1,2*jj-1] = (real(g[kk,jj]) + real(λ[kk,jj]))
+	for jj = 1:1:Num
+		for kk = (jj+1):1:Num
+			# XX
+			h[2*kk-1,2*jj-1] = (real(g[kk,jj]) + real(λ[kk,jj]))
 
-            #XY
-            h[2*kk-1,2*jj] = (imag(λ[kk,jj]) - imag(g[kk,jj]))
+			#XY
+			h[2*kk-1,2*jj] = (imag(λ[kk,jj]) - imag(g[kk,jj]))
 
-            #YX
-            h[2*kk,2*jj-1] = (imag(λ[kk,jj]) + imag(g[kk,jj]))
+			#YX
+			h[2*kk,2*jj-1] = (imag(λ[kk,jj]) + imag(g[kk,jj]))
 
-            #YY
-            h[2*kk,2*jj] = (real(g[kk,jj]) - real(λ[kk,jj]))
-        end
+			#YY
+			h[2*kk,2*jj] = (real(g[kk,jj]) - real(λ[kk,jj]))
+		end
 
-        #YX same
-        h[2*jj,2*jj-1] = 2*imag(λ[jj,jj])
-    end
+		#YX same
+		h[2*jj,2*jj-1] = 2*imag(λ[jj,jj])
+	end
 
     h[:,:] = h[:,:] + h[:,:]'
 
