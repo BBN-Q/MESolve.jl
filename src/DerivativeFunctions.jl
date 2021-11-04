@@ -353,7 +353,7 @@ end
 function d_av!(out::Vector{Float64},
               av_vec::Vector{Float64},
               M::Array{Float64,2},
-              rv::Function,
+              drv::Function,
               t::AbstractFloat,
               drv_temp::Array{Float64,1})
 
@@ -364,7 +364,8 @@ end
 
 function d_av!(out::Vector{Float64},
               av_vec::Vector{Float64},
-              M::Function,drv::Function,
+              M::Function,
+              drv::Function,
               t::AbstractFloat,
               M_temp::Array{Float64,2},
               drv_temp::Array{Float64,1})
